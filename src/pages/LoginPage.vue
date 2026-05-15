@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useLoginMutation } from '@/api/mutations/auth.mutations'
 import { Button } from '@/components/ui/button'
-import { useLoginMutation } from '@/mutations/auth.mutations'
 import { MOCK_AUTH_ACCOUNT } from '@/services/auth.service'
 import type { ApiError } from '@/types/api'
 

@@ -1,8 +1,18 @@
 <script setup lang="ts">
-import { Loader2 } from 'lucide-vue-next'
-import { useMeQuery } from '@/queries/auth.queries'
+import { Loader2 } from "lucide-vue-next";
+import { useMeQuery } from "@/api/queries/auth.queries";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const meQuery = useMeQuery()
+const meQuery = useMeQuery();
 </script>
 
 <template>
@@ -10,7 +20,8 @@ const meQuery = useMeQuery()
     <div>
       <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
       <p class="mt-2 text-muted-foreground">
-        Ready for analytics, semantic search, chatbot, and recommendation modules.
+        Ready for analytics, semantic search, chatbot, and recommendation
+        modules.
       </p>
     </div>
 
@@ -34,7 +45,10 @@ const meQuery = useMeQuery()
     </div>
 
     <div class="rounded-lg border bg-card p-4 text-card-foreground shadow-sm">
-      <div v-if="meQuery.isLoading.value" class="flex items-center gap-2 text-muted-foreground">
+      <div
+        v-if="meQuery.isLoading.value"
+        class="flex items-center gap-2 text-muted-foreground"
+      >
         <Loader2 class="h-4 w-4 animate-spin" />
         Loading profile...
       </div>
@@ -43,7 +57,27 @@ const meQuery = useMeQuery()
         Could not load profile. Check NestJS auth endpoints or token validity.
       </p>
 
-      <pre v-else class="overflow-auto rounded-md bg-muted p-4 text-sm">{{ meQuery.data.value }}</pre>
+      <pre v-else class="overflow-auto rounded-md bg-muted p-4 text-sm">{{
+        meQuery.data.value
+      }}</pre>
+    </div>
+    <div class="mt-4 flex items-center gap-2">
+      <Button variant="destructive"> Button </Button>
+      <Select>
+        <SelectTrigger class="w-[180px]">
+          <SelectValue placeholder="Select a fruit" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectLabel>Fruits</SelectLabel>
+            <SelectItem value="apple"> Apple </SelectItem>
+            <SelectItem value="banana"> Banana </SelectItem>
+            <SelectItem value="blueberry"> Blueberry </SelectItem>
+            <SelectItem value="grapes"> Grapes </SelectItem>
+            <SelectItem value="pineapple"> Pineapple </SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
     </div>
   </section>
 </template>
