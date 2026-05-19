@@ -54,7 +54,7 @@ const demoStats = [
             <p
               class="text-sm font-medium uppercase tracking-wide text-blue-700"
             >
-              Bookora Admin
+              Bookora
             </p>
           </div>
           <div class="space-y-3">

@@ -99,7 +99,7 @@ const roleLabel = computed(() => {
 
 const user = computed(() => {
   return {
-    name: roleLabel.value,
+    name: authStore.name || roleLabel.value,
     email: authStore.email || 'admin@bookora.local',
     avatar: '',
   }

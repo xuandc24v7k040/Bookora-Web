@@ -26,13 +26,15 @@ import { useBranchStore } from '@/stores/branch.store'
 const authStore = useAuthStore()
 const branchStore = useBranchStore()
 
+branchStore.applyAuthContext(authStore.role, authStore.branchId)
+
 const roleLabel = computed(() => {
   return authStore.role === 'BRANCH_ADMIN' ? 'Branch Admin' : 'Super Admin'
 })
 
-function setSelectedBranch(value: unknown): void {
-  if (value === 'can-tho' || value === 'hau-giang') {
-    branchStore.setSelectedBranch(value)
+function setManagementScope(value: unknown): void {
+  if (value === 'all' || value === 'can-tho' || value === 'hau-giang') {
+    branchStore.setManagementScope(value)
   }
 }
 </script>
@@ -75,34 +77,52 @@ function setSelectedBranch(value: unknown): void {
           </div>
 
           <div class="flex justify-end">
-            <DropdownMenu>
+            <DropdownMenu v-if="authStore.role === 'SUPER_ADMIN'">
               <DropdownMenuTrigger as-child>
                 <Button type="button" variant="outline" class="h-10 justify-start gap-2 rounded-xl bg-background">
                   <Building2 class="h-4 w-4 text-muted-foreground" />
-                  <span class="hidden text-xs text-muted-foreground md:inline">Chi nhánh</span>
+                  <span class="hidden text-xs text-muted-foreground md:inline">Phạm vi</span>
                   <span class="max-w-20 truncate font-medium sm:max-w-36">
-                    {{ branchStore.selectedBranch.name }}
+                    {{ branchStore.scopeLabel }}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" class="w-56">
-                <DropdownMenuLabel>Chi nhánh</DropdownMenuLabel>
+                <DropdownMenuLabel>Phạm vi quản lý</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem class="gap-2" @click="setManagementScope('all')">
+                  <Building2 class="h-4 w-4 text-muted-foreground" />
+                  <span>Toàn hệ thống</span>
+                  <Check
+                    v-if="branchStore.managementScope === 'all'"
+                    class="ml-auto h-4 w-4 text-primary"
+                  />
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   v-for="branch in branchStore.branches"
                   :key="branch.id"
                   class="gap-2"
-                  @click="setSelectedBranch(branch.id)"
+                  @click="setManagementScope(branch.id)"
                 >
                   <Building2 class="h-4 w-4 text-muted-foreground" />
                   <span>{{ branch.name }}</span>
                   <Check
-                    v-if="branch.id === branchStore.selectedBranchId"
+                    v-if="branch.id === branchStore.managementScope"
                     class="ml-auto h-4 w-4 text-primary"
                   />
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            <div
+              v-else
+              class="flex h-10 items-center gap-2 rounded-xl border bg-background px-3 text-sm font-medium shadow-sm"
+            >
+              <Building2 class="h-4 w-4 text-muted-foreground" />
+              <span class="max-w-24 truncate sm:max-w-40">
+                {{ authStore.branchName ?? branchStore.selectedBranch.name }}
+              </span>
+            </div>
           </div>
         </div>
       </header>

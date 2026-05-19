@@ -54,7 +54,7 @@ const stats = computed<StatCard[]>(() => {
       {
         label: 'Đơn trong ngày',
         value: '42',
-        description: 'Đang chờ xử lý tại chi nhánh',
+        description: 'Theo chi nhánh được gán',
         trend: '↑ 12.5% so với hôm qua',
         icon: ClipboardList,
         iconClass: 'bg-blue-50 text-blue-600',
@@ -62,7 +62,7 @@ const stats = computed<StatCard[]>(() => {
       {
         label: 'Sản phẩm còn hàng',
         value: '1,284',
-        description: 'Theo chi nhánh đang chọn',
+        description: 'Theo chi nhánh được gán',
         trend: '↑ 8.2% so với hôm qua',
         icon: PackageCheck,
         iconClass: 'bg-emerald-50 text-emerald-600',
@@ -82,7 +82,7 @@ const stats = computed<StatCard[]>(() => {
     {
       label: 'Doanh thu hôm nay',
       value: '128M',
-      description: 'Tổng hợp toàn hệ thống',
+      description: `Phạm vi: ${branchStore.scopeLabel}`,
       trend: '↑ 12.5% so với hôm qua',
       icon: WalletCards,
       iconClass: 'bg-blue-50 text-blue-600',
@@ -90,15 +90,15 @@ const stats = computed<StatCard[]>(() => {
     {
       label: 'Đơn hàng mới',
       value: '316',
-      description: 'Từ mọi chi nhánh',
+      description: `Phạm vi: ${branchStore.scopeLabel}`,
       trend: '↑ 8.2% so với hôm qua',
       icon: ClipboardList,
       iconClass: 'bg-violet-50 text-violet-600',
     },
     {
       label: 'Chi nhánh hoạt động',
-      value: '2',
-      description: 'Cần Thơ và Hậu Giang',
+      value: branchStore.managementScope === 'all' ? '2' : '1',
+      description: branchStore.scopeLabel,
       trend: '— Không đổi',
       icon: Building2,
       iconClass: 'bg-emerald-50 text-emerald-600',
@@ -116,6 +116,14 @@ const stats = computed<StatCard[]>(() => {
 
 const roleLabel = computed(() => {
   return authStore.role === 'BRANCH_ADMIN' ? 'Branch Admin' : 'Super Admin'
+})
+
+const contextLabel = computed(() => {
+  if (authStore.role === 'BRANCH_ADMIN') {
+    return `Chi nhánh được gán: ${authStore.branchName ?? branchStore.selectedBranch.name}`
+  }
+
+  return `Phạm vi quản lý: ${branchStore.scopeLabel}`
 })
 </script>
 
@@ -141,9 +149,7 @@ const roleLabel = computed(() => {
             <Badge variant="secondary">{{ roleLabel }}</Badge>
           </div>
           <p class="text-sm leading-6 text-muted-foreground sm:text-base">{{ description }}</p>
-          <p v-if="scope === 'branch-admin'" class="text-sm font-medium text-foreground">
-            Đang quản lý chi nhánh: {{ branchStore.selectedBranch.name }}
-          </p>
+          <p class="text-sm font-medium text-foreground">{{ contextLabel }}</p>
         </div>
         <Button type="button" variant="outline" class="rounded-xl">Thao tác demo</Button>
       </div>

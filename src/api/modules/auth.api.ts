@@ -10,7 +10,10 @@ const mockUser: User = {
   id: 'mock-user-1',
   email: MOCK_AUTH_ACCOUNT.email,
   name: 'Sinh viên Demo',
-  role: 'student',
+  role: 'SUPER_ADMIN',
+  branchId: null,
+  branchName: null,
+  scopes: ['all', 'can-tho', 'hau-giang'],
   avatarUrl: null,
 }
 

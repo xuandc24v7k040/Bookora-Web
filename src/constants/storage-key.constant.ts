@@ -3,4 +3,5 @@ export const STORAGE_KEYS = {
   sidebarCollapsed: 'bookora.sidebar_collapsed',
   auth: 'bookora.auth',
   selectedBranchId: 'bookora.selected_branch_id',
+  managementScope: 'bookora.management_scope',
 } as const

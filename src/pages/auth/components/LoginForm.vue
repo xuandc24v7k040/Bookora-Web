@@ -1,49 +1,46 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from 'vue'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { useAuthStore } from '@/stores/auth.store'
-import type { AdminRole } from '@/types/auth.type'
+import type { HTMLAttributes } from "vue";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { useAuthStore } from "@/stores/auth.store";
+import { useBranchStore } from "@/stores/branch.store";
 
 const props = defineProps<{
-  class?: HTMLAttributes['class']
-}>()
+  class?: HTMLAttributes["class"];
+}>();
 
-const router = useRouter()
-const authStore = useAuthStore()
+const router = useRouter();
+const authStore = useAuthStore();
+const branchStore = useBranchStore();
 
-const email = ref('admin@bookora.local')
-const password = ref('password')
-const role = ref<AdminRole>('SUPER_ADMIN')
+const email = ref("xuandc24v7k040@gmail.com");
+const password = ref("password");
 
 async function login(): Promise<void> {
-  authStore.login({
-    email: email.value.trim() || 'admin@bookora.local',
-    role: role.value,
-  })
+  const loggedIn = authStore.login({
+    email: email.value,
+    password: password.value,
+  });
+
+  if (!loggedIn || !authStore.role) {
+    return;
+  }
+
+  if (authStore.role === "SUPER_ADMIN") {
+    branchStore.setManagementScope("all");
+  } else {
+    branchStore.applyAuthContext(authStore.role, authStore.branchId);
+  }
 
   await router.replace(
-    role.value === 'SUPER_ADMIN'
-      ? { name: 'super-admin-dashboard' }
-      : { name: 'branch-admin-dashboard' },
-  )
+    authStore.role === "SUPER_ADMIN"
+      ? { name: "super-admin-dashboard" }
+      : { name: "branch-admin-dashboard" },
+  );
 }
 </script>
 
@@ -53,7 +50,8 @@ async function login(): Promise<void> {
       <div class="space-y-1.5">
         <h1 class="text-2xl font-semibold tracking-tight">Đăng nhập admin</h1>
         <p class="text-sm leading-5 text-muted-foreground">
-          Sử dụng tài khoản demo để truy cập dashboard quản trị Bookora.
+          Đăng nhập bằng email mock để hệ thống xác định đúng vai trò và chi
+          nhánh.
         </p>
       </div>
 
@@ -64,7 +62,7 @@ async function login(): Promise<void> {
           v-model="email"
           type="email"
           autocomplete="email"
-          placeholder="admin@bookora.local"
+          placeholder="xuandc24v7k040@gmail.com"
           required
         />
       </Field>
@@ -81,23 +79,12 @@ async function login(): Promise<void> {
         />
       </Field>
 
-      <Field>
-        <FieldLabel>Vai trò test</FieldLabel>
-        <Select v-model="role">
-          <SelectTrigger class="w-full">
-            <SelectValue placeholder="Chọn vai trò" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="SUPER_ADMIN">SUPER_ADMIN</SelectItem>
-              <SelectItem value="BRANCH_ADMIN">BRANCH_ADMIN</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-        <FieldDescription>
-          SUPER_ADMIN vào dashboard hệ thống, BRANCH_ADMIN vào dashboard chi nhánh.
-        </FieldDescription>
-      </Field>
+      <p
+        v-if="authStore.loginError"
+        class="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive"
+      >
+        {{ authStore.loginError }}
+      </p>
 
       <Field>
         <Button type="submit" class="w-full rounded-xl">Đăng nhập</Button>
