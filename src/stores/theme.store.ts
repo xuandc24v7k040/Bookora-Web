@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { STORAGE_KEYS } from '@/constants/storage-key.constant'
 
 export type Theme = 'light' | 'dark' | 'system'
 

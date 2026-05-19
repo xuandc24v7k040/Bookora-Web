@@ -1,77 +1,103 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
-import type { LoginResponse, User } from '@/types/auth'
+import { STORAGE_KEYS } from '@/constants/storage-key.constant'
+import type { AdminRole, AuthStatus, User } from '@/types/auth.type'
 
-function readStoredUser(): User | null {
-  const rawUser = localStorage.getItem(STORAGE_KEYS.authUser)
+interface StoredAuthState {
+  email: string
+  role: AdminRole
+}
 
-  if (!rawUser) {
+function readStoredAuth(): StoredAuthState | null {
+  const rawValue = localStorage.getItem(STORAGE_KEYS.auth)
+
+  if (!rawValue) {
     return null
   }
 
   try {
-    return JSON.parse(rawUser) as User
+    const parsedValue = JSON.parse(rawValue) as Partial<StoredAuthState>
+
+    if (
+      typeof parsedValue.email === 'string' &&
+      (parsedValue.role === 'SUPER_ADMIN' || parsedValue.role === 'BRANCH_ADMIN')
+    ) {
+      return {
+        email: parsedValue.email,
+        role: parsedValue.role,
+      }
+    }
   } catch {
-    localStorage.removeItem(STORAGE_KEYS.authUser)
-    return null
+    localStorage.removeItem(STORAGE_KEYS.auth)
   }
+
+  return null
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<User | null>(null)
-  const accessToken = ref<string | null>(null)
-  const hasHydrated = ref(false)
+  const storedAuth = readStoredAuth()
+  const email = ref(storedAuth?.email ?? '')
+  const role = ref<AdminRole | null>(storedAuth?.role ?? null)
+  const authStatus = ref<AuthStatus>(storedAuth ? 'authenticated' : 'unauthenticated')
 
-  const isAuthenticated = computed(() => Boolean(accessToken.value))
-
-  function setAccessToken(token: string | null): void {
-    accessToken.value = token
-
-    if (token) {
-      localStorage.setItem(STORAGE_KEYS.accessToken, token)
-      return
+  const isAuthenticated = computed(() => authStatus.value === 'authenticated' && role.value !== null)
+  const user = computed<User | null>(() => {
+    if (!isAuthenticated.value || !role.value) {
+      return null
     }
 
-    localStorage.removeItem(STORAGE_KEYS.accessToken)
-  }
-
-  function setUser(nextUser: User | null): void {
-    user.value = nextUser
-
-    if (nextUser) {
-      localStorage.setItem(STORAGE_KEYS.authUser, JSON.stringify(nextUser))
-      return
+    return {
+      id: role.value.toLowerCase(),
+      email: email.value,
+      name: email.value,
+      role: role.value,
+      avatarUrl: null,
     }
+  })
 
-    localStorage.removeItem(STORAGE_KEYS.authUser)
+  function setLoading(): void {
+    authStatus.value = 'loading'
   }
 
-  function setAuth(payload: LoginResponse): void {
-    setAccessToken(payload.accessToken)
-    setUser(payload.user)
+  function login(payload: { email: string; role: AdminRole }): void {
+    email.value = payload.email
+    role.value = payload.role
+    authStatus.value = 'authenticated'
+    localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(payload))
   }
 
-  function restoreFromStorage(): void {
-    accessToken.value = localStorage.getItem(STORAGE_KEYS.accessToken)
-    user.value = readStoredUser()
-    hasHydrated.value = true
+  function setAuthenticated(nextUser: User): void {
+    const nextRole = nextUser.role === 'SUPER_ADMIN' || nextUser.role === 'BRANCH_ADMIN'
+      ? nextUser.role
+      : 'SUPER_ADMIN'
+
+    login({
+      email: nextUser.email,
+      role: nextRole,
+    })
   }
 
-  function clearAuth(): void {
-    setAccessToken(null)
-    setUser(null)
+  function logout(): void {
+    email.value = ''
+    role.value = null
+    authStatus.value = 'unauthenticated'
+    localStorage.removeItem(STORAGE_KEYS.auth)
+  }
+
+  function setUnauthenticated(): void {
+    logout()
   }
 
   return {
     user,
-    accessToken,
-    hasHydrated,
+    email,
+    role,
+    authStatus,
     isAuthenticated,
-    setAccessToken,
-    setUser,
-    setAuth,
-    restoreFromStorage,
-    clearAuth,
+    setLoading,
+    login,
+    setAuthenticated,
+    logout,
+    setUnauthenticated,
   }
 })

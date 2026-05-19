@@ -1,73 +1,118 @@
 <script setup lang="ts">
-import { LogOut, Moon, PanelLeft, Sun } from 'lucide-vue-next'
+import { Building2, Check, Search } from 'lucide-vue-next'
 import { computed } from 'vue'
-import { RouterLink, RouterView } from 'vue-router'
-import { useLogoutMutation } from '@/api/mutations/auth.mutations'
+import { RouterView } from 'vue-router'
+import AppSidebar from '@/components/admin/sidebar/AppSidebar.vue'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar'
 import { useAuthStore } from '@/stores/auth.store'
-import { useThemeStore } from '@/stores/theme.store'
-import { useUiStore } from '@/stores/ui.store'
+import { useBranchStore } from '@/stores/branch.store'
 
 const authStore = useAuthStore()
-const themeStore = useThemeStore()
-const uiStore = useUiStore()
-const logoutMutation = useLogoutMutation()
+const branchStore = useBranchStore()
 
-const userName = computed(() => authStore.user?.name ?? authStore.user?.email ?? 'Guest')
+const roleLabel = computed(() => {
+  return authStore.role === 'BRANCH_ADMIN' ? 'Branch Admin' : 'Super Admin'
+})
 
-function toggleTheme(): void {
-  themeStore.setTheme(themeStore.resolvedTheme === 'dark' ? 'light' : 'dark')
+function setSelectedBranch(value: unknown): void {
+  if (value === 'can-tho' || value === 'hau-giang') {
+    branchStore.setSelectedBranch(value)
+  }
 }
 </script>
 
 <template>
-  <div class="min-h-screen bg-background text-foreground">
-    <header class="border-b bg-background/95 backdrop-blur">
-      <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <div class="flex items-center gap-3">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label="Toggle sidebar"
-            @click="uiStore.toggleSidebar"
-          >
-            <PanelLeft class="h-4 w-4" />
-          </Button>
-          <RouterLink class="font-semibold" :to="{ name: 'home' }">Exam FE</RouterLink>
+  <SidebarProvider class="min-h-screen bg-muted/30 text-foreground">
+    <AppSidebar />
+
+    <SidebarInset>
+      <header class="sticky top-0 z-20 border-b bg-background/95 backdrop-blur">
+        <div class="grid min-h-16 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 sm:gap-3 sm:px-6">
+          <div class="flex min-w-0 items-center gap-3">
+            <SidebarTrigger />
+            <Separator orientation="vertical" class="hidden h-6 sm:block" />
+
+            <div class="hidden min-w-0 sm:block">
+              <div class="flex items-center gap-2">
+                <p class="truncate text-lg font-semibold">Bookora</p>
+                <Badge variant="secondary">{{ roleLabel }}</Badge>
+              </div>
+              <p class="hidden truncate text-sm text-muted-foreground sm:block">
+                {{ authStore.email || 'admin@bookora.local' }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex min-w-0 justify-center">
+            <div class="relative w-full max-w-[560px]">
+              <Search class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                class="h-10 rounded-xl border-border bg-background pl-9 pr-3 shadow-sm sm:pr-20"
+                placeholder="Tìm kiếm nhanh đơn hàng, khách hàng, sản phẩm,..."
+              />
+              <kbd
+                class="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 rounded-md border bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground sm:inline-flex"
+              >
+                Ctrl + K
+              </kbd>
+            </div>
+          </div>
+
+          <div class="flex justify-end">
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <Button type="button" variant="outline" class="h-10 justify-start gap-2 rounded-xl bg-background">
+                  <Building2 class="h-4 w-4 text-muted-foreground" />
+                  <span class="hidden text-xs text-muted-foreground md:inline">Chi nhánh</span>
+                  <span class="max-w-20 truncate font-medium sm:max-w-36">
+                    {{ branchStore.selectedBranch.name }}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" class="w-56">
+                <DropdownMenuLabel>Chi nhánh</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  v-for="branch in branchStore.branches"
+                  :key="branch.id"
+                  class="gap-2"
+                  @click="setSelectedBranch(branch.id)"
+                >
+                  <Building2 class="h-4 w-4 text-muted-foreground" />
+                  <span>{{ branch.name }}</span>
+                  <Check
+                    v-if="branch.id === branchStore.selectedBranchId"
+                    class="ml-auto h-4 w-4 text-primary"
+                  />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
+      </header>
 
-        <nav class="flex items-center gap-2">
-          <RouterLink
-            class="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-            :to="{ name: 'dashboard' }"
-          >
-            Dashboard
-          </RouterLink>
-          <Button type="button" variant="ghost" size="icon" aria-label="Toggle theme" @click="toggleTheme">
-            <Moon v-if="themeStore.resolvedTheme === 'light'" class="h-4 w-4" />
-            <Sun v-else class="h-4 w-4" />
-          </Button>
-          <Button
-            v-if="authStore.isAuthenticated"
-            type="button"
-            variant="outline"
-            size="sm"
-            :disabled="logoutMutation.isPending.value"
-            @click="logoutMutation.mutate()"
-          >
-            <LogOut class="mr-2 h-4 w-4" />
-            Logout
-          </Button>
-        </nav>
-      </div>
-    </header>
-
-    <main class="mx-auto w-full max-w-6xl px-4 py-8">
-      <p v-if="authStore.isAuthenticated" class="mb-4 text-sm text-muted-foreground">
-        Signed in as {{ userName }}
-      </p>
-      <RouterView />
-    </main>
-  </div>
+      <main class="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:py-8">
+        <RouterView />
+        <footer class="mt-auto pt-8 text-sm text-muted-foreground">
+          © 2025 Bookora. All rights reserved.
+        </footer>
+      </main>
+    </SidebarInset>
+  </SidebarProvider>
 </template>

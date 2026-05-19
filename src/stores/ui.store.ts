@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { STORAGE_KEYS } from '@/constants/storage-key.constant'
 
 export const useUiStore = defineStore('ui', () => {
   const sidebarCollapsed = ref(

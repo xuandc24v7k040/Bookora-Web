@@ -5,9 +5,8 @@ import { VueQueryPlugin } from '@tanstack/vue-query'
 import { createPinia } from 'pinia'
 import { queryClient } from '@/lib/query-client'
 import { router } from '@/router'
-import { useAuthStore } from '@/stores/auth.store'
 import { useThemeStore } from '@/stores/theme.store'
-import { setupApiInterceptors } from '@/services/api'
+import { setupApiInterceptors } from '@/services/api.service'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -18,7 +17,6 @@ app.use(VueQueryPlugin, { queryClient })
 
 setupApiInterceptors(pinia)
 
-useAuthStore(pinia).restoreFromStorage()
 useThemeStore(pinia).initTheme()
 
 app.mount('#app')

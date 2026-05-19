@@ -1,5 +1,5 @@
 <template>
-  <main class="grid min-h-screen place-items-center bg-background px-4 py-10 text-foreground">
+  <main class="min-h-svh bg-background text-foreground">
     <RouterView />
   </main>
 </template>
