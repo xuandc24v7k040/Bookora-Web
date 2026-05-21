@@ -188,9 +188,11 @@ const contextLabel = computed(() => {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <slot>
         <div class="rounded-xl border border-dashed bg-muted/40 p-6 text-sm leading-6 text-muted-foreground">
           Chưa triển khai CRUD hoặc API thật. Trang hiện chỉ dựng layout, điều hướng, guard quyền và dữ liệu demo.
         </div>
+        </slot>
       </CardContent>
     </Card>
   </section>

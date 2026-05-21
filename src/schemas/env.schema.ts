@@ -1,5 +1,11 @@
-import { z } from "zod";
+import { z } from 'zod'
 
-export const envSchema = z.object({
-  VITE_API_BASE_URL: z.string().url().default("http://localhost:8000/api"),
-});
+export const envSchema = z
+  .object({
+    VITE_API_URL: z.string().url().default('http://localhost:8000'),
+    VITE_API_BASE_URL: z.string().url().optional(),
+  })
+  .transform((env) => ({
+    ...env,
+    VITE_API_BASE_URL: env.VITE_API_BASE_URL ?? `${env.VITE_API_URL}/api`,
+  }))
