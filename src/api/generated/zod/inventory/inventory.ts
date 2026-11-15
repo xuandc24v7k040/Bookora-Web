@@ -9,8 +9,8 @@ import * as zod from 'zod';
 
 
 /**
- * Tìm biến thể sản phẩm toàn cục cho phiếu nhập kho
- * @summary Tìm biến thể sản phẩm toàn cục cho phiếu nhập kho
+ * Tìm biến thể và tồn hiện tại tại chi nhánh nhận hàng
+ * @summary Tìm biến thể và tồn hiện tại tại chi nhánh nhận hàng
  */
 export const inventoryVariantOptionsQueryPageDefault = 1;
 
@@ -26,7 +26,7 @@ export const InventoryVariantOptionsQueryParams = zod.strictObject({
 })
 
 export const InventoryVariantOptionsHeader = zod.strictObject({
-  "X-Branch-Id": zod.ulid().optional().describe('ULID chi nhánh đang được chọn. Có thể bỏ qua với route Super Admin hoặc route hỗ trợ scope rộng.')
+  "X-Branch-Id": zod.ulid().describe('ULID chi nhánh đang được chọn. Bắt buộc với route cần selected branch.')
 })
 
 /**

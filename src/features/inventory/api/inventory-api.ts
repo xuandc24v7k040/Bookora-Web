@@ -31,13 +31,7 @@ const branchScopedRequest = { branchScoped: true } as const;
 export const listVariantOptions = (
   params: InventoryVariantOptionsParams,
   signal?: AbortSignal,
-  branchScoped = false,
-) =>
-  inventoryVariantOptions(
-    params,
-    branchScoped ? branchScopedRequest : undefined,
-    signal,
-  );
+) => inventoryVariantOptions(params, branchScopedRequest, signal);
 
 export const listStocks = (
   params: InventoryStocksListParams,

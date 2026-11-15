@@ -7,8 +7,13 @@ import type {
 import { branchScopedQueryKeys } from "@/api/branch-query-cache";
 
 export const inventoryKeys = {
-  variantOptions: (params: object) =>
-    ["inventory", "variant-options", params] as const,
+  variantOptions: (branchId: string, params: object) =>
+    [
+      ...branchScopedQueryKeys.scope(branchId),
+      "inventory",
+      "variant-options",
+      params,
+    ] as const,
   scoped: (branchId: string) =>
     [...branchScopedQueryKeys.scope(branchId), "inventory"] as const,
   stocks: (branchId: string, params: InventoryStocksListParams) =>

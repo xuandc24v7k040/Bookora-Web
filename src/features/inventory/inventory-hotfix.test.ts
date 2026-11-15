@@ -6,6 +6,8 @@ import listSource from "./pages/StockReceiptListPage.vue?raw";
 import stocksSource from "./pages/InventoryStocksPage.vue?raw";
 import columnsSource from "./components/inventory-columns.ts?raw";
 import movementsSource from "./pages/InventoryMovementsPage.vue?raw";
+import inventoryApiSource from "./api/inventory-api.ts?raw";
+import { inventoryKeys } from "./api/inventory-query-keys";
 import {
   createMovementColumns,
   createGroupedStockColumns,
@@ -129,6 +131,31 @@ describe("inventory hotfix contract", () => {
       "size-5 shrink-0 border-2 border-primary/70",
     );
     expect(formSource.match(/<Checkbox/g)).toHaveLength(2);
+  });
+
+  it("shows branch current stock only on selectable variant rows", () => {
+    expect(formSource.match(/Tồn hiện tại:/g)).toHaveLength(2);
+    expect(formSource).toContain("group.variants[0].currentStock");
+    expect(formSource).toContain("variant.currentStock");
+
+    const parentTrigger = formSource.slice(
+      formSource.indexOf("<CollapsibleTrigger"),
+      formSource.indexOf("</CollapsibleTrigger>"),
+    );
+    expect(parentTrigger).not.toContain("currentStock");
+  });
+
+  it("scopes variant requests and cache keys to the receiving branch", () => {
+    expect(inventoryApiSource).toContain(
+      "inventoryVariantOptions(params, branchScopedRequest, signal)",
+    );
+    expect(inventoryKeys.variantOptions("branch-a", { page: 1 })).not.toEqual(
+      inventoryKeys.variantOptions("branch-b", { page: 1 }),
+    );
+    expect(formSource).toContain(
+      "inventoryKeys.variantOptions(branchId.value, variantParams.value)",
+    );
+    expect(formSource).not.toContain('"global"');
   });
 
   it("uses a shadcn horizontal ScrollArea only around receipt items", () => {

@@ -53,8 +53,8 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
- * Tìm biến thể sản phẩm toàn cục cho phiếu nhập kho
- * @summary Tìm biến thể sản phẩm toàn cục cho phiếu nhập kho
+ * Tìm biến thể và tồn hiện tại tại chi nhánh nhận hàng
+ * @summary Tìm biến thể và tồn hiện tại tại chi nhánh nhận hàng
  */
 export const inventoryVariantOptions = (
     params?: MaybeRef<InventoryVariantOptionsParams>,
@@ -102,7 +102,7 @@ export type InventoryVariantOptionsQueryError = ErrorType<ErrorResponseDto>
 
 
 /**
- * @summary Tìm biến thể sản phẩm toàn cục cho phiếu nhập kho
+ * @summary Tìm biến thể và tồn hiện tại tại chi nhánh nhận hàng
  */
 
 export function useInventoryVariantOptions<TData = Awaited<ReturnType<typeof inventoryVariantOptions>>, TError = ErrorType<ErrorResponseDto>>(

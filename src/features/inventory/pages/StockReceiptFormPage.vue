@@ -51,7 +51,7 @@ import { inventoryKeys } from "../api/inventory-query-keys";
 import { formatMoney, inventoryErrorMessage } from "../utils/inventory-format";
 
 interface FormItem {
-  variant: InventoryVariantOptionResponseDto;
+  variant: Omit<InventoryVariantOptionResponseDto, "currentStock">;
   quantity: number;
   costPrice: string;
 }
@@ -108,17 +108,11 @@ const variantParams = computed(() => ({
     : {}),
 }));
 const variantQuery = useQuery({
-  queryKey: computed(() => [
-    ...inventoryKeys.variantOptions(variantParams.value),
-    routePrefix.value === "branch-admin" ? branchId.value : "global",
-  ]),
-  queryFn: ({ signal }) =>
-    listVariantOptions(
-      variantParams.value,
-      signal,
-      routePrefix.value === "branch-admin",
-    ),
-  enabled: selectorOpen,
+  queryKey: computed(() =>
+    inventoryKeys.variantOptions(branchId.value, variantParams.value),
+  ),
+  queryFn: ({ signal }) => listVariantOptions(variantParams.value, signal),
+  enabled: computed(() => Boolean(selectorOpen.value && branchId.value)),
 });
 const variantGroups = computed<VariantGroup[]>(() => {
   const groups = new Map<string, VariantGroup>();
@@ -530,8 +524,8 @@ onBeforeUnmount(() => {
       ><DialogHeader class="shrink-0 border-b p-5 pb-4"
         ><DialogTitle>Chọn biến thể sản phẩm</DialogTitle
         ><DialogDescription
-          >Tìm theo tên, SKU hoặc barcode. Danh sách này không phụ thuộc chi
-          nhánh.</DialogDescription
+          >Tìm theo tên, SKU hoặc barcode. Tồn hiện tại được tính tại chi nhánh
+          nhận hàng.</DialogDescription
         >
         <div class="relative pt-2">
           <Search
@@ -599,6 +593,12 @@ onBeforeUnmount(() => {
                   <span
                     class="block truncate font-mono text-xs text-muted-foreground"
                     >SKU: {{ group.variants[0].sku }}</span
+                  >
+                  <span class="block text-xs text-muted-foreground"
+                    >Tồn hiện tại:
+                    <span class="font-medium text-foreground">{{
+                      group.variants[0].currentStock
+                    }}</span></span
                   >
                 </span>
                 <Checkbox
@@ -686,6 +686,12 @@ onBeforeUnmount(() => {
                       <span
                         class="block break-all font-mono text-xs text-muted-foreground"
                         >SKU: {{ variant.sku }}</span
+                      >
+                      <span class="block text-xs text-muted-foreground"
+                        >Tồn hiện tại:
+                        <span class="font-medium text-foreground">{{
+                          variant.currentStock
+                        }}</span></span
                       >
                       <span
                         v-if="variant.barcode"

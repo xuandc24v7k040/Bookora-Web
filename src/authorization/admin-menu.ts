@@ -207,7 +207,7 @@ export const ADMIN_MENU: readonly AdminMenuItem[] = [
       },
       {
         id: "stock-receipts",
-        label: "Phiếu nhập kho",
+        label: "Nhập kho",
         routeNames: {
           SYSTEM: "super-admin-stock-receipts",
           BRANCH: "branch-admin-stock-receipts",

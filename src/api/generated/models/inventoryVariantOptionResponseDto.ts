@@ -32,4 +32,6 @@ export interface InventoryVariantOptionResponseDto {
   optionSummary?: string | null;
   /** @nullable */
   thumbnailUrl?: string | null;
+  /** @minimum 0 */
+  currentStock: number;
 }
