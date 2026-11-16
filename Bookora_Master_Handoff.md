@@ -15,6 +15,10 @@ evidence also remain open at program level.
 
 ## Canonical handoffs
 
+- Reviews Variant & Media Upgrade (`NOT DONE`, triển khai sau Phase 18):
+  `Bookora_Review_Variant_Media_Upgrade_Handoff.md`.
+  Review theo OrderItem, snapshot phân loại và 0–4 ảnh R2 đã triển khai;
+  manual browser/responsive acceptance chưa có bằng chứng do Computer Use bị chặn.
 - Phase 18:
   `Bookora_Phase18_Dashboard_Revenue_Report_Handoff.md`
 - Phase 18 Super Admin Dashboard Visual Hotfix (`DONE`):

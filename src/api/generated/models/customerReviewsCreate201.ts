@@ -7,7 +7,7 @@
  */
 import type { CustomerReviewDto } from './customerReviewDto';
 
-export type CustomerReviewsCreate200 = {
+export type CustomerReviewsCreate201 = {
   statusCode: number;
   message: string;
   data: CustomerReviewDto;

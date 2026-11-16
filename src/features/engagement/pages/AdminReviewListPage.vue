@@ -24,6 +24,9 @@ import type {
 } from "@/components/admin/table/interface";
 import { Button } from "@/components/ui/button";
 import { adminReviewColumns } from "../components/admin-review-columns";
+import { engagementKeys } from "../api/engagement-api";
+import { publishEngagementChange } from "../state/engagement-sync";
+import { invalidateReviewProduct } from "../state/review-invalidation";
 
 const page = ref(1);
 const limit = ref(10);
@@ -54,8 +57,17 @@ const query = useQuery({
 const visibilityMutation = useMutation({
   mutationFn: ({ id, visible }: { id: string; visible: boolean }) =>
     adminReviewsSetVisibility(id, { isVisible: visible }),
-  onSuccess: () => {
-    void queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
+  onSuccess: (response) => {
+    const product = response.data.product;
+    invalidateReviewProduct(queryClient, {
+      productId: product.id,
+      productSlug: product.slug,
+    });
+    void queryClient.invalidateQueries({ queryKey: engagementKeys.reviews });
+    publishEngagementChange({
+      productId: product.id,
+      productSlug: product.slug,
+    });
     toast.success("Đã cập nhật trạng thái hiển thị đánh giá");
   },
   onError: () => toast.error("Không thể cập nhật đánh giá."),

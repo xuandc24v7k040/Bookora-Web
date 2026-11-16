@@ -88,7 +88,7 @@ describe("Phase 17 UI/UX hotfix contracts", () => {
     expect(publicReviewsSource).toContain("formatRelativeTime");
     expect(publicReviewsSource).toContain('"Không có nội dung đánh giá."');
     expect(publicReviewsSource).toContain("[overflow-wrap:anywhere]");
-    expect(publicReviewsSource).not.toContain("Có hình ảnh");
+    expect(publicReviewsSource).toContain("Có hình ảnh");
   });
 
   it("keeps review dialog actions fixed, accessible and single-submit", () => {

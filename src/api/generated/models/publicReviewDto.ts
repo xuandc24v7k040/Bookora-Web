@@ -6,8 +6,12 @@
  * OpenAPI spec version: 1.0
  */
 import type { PublicReviewerDto } from './publicReviewerDto';
+import type { ReviewMediaDto } from './reviewMediaDto';
 
 export interface PublicReviewDto {
+  /** @nullable */
+  variantLabel: string | null;
+  media: ReviewMediaDto[];
   /**
      * @minLength 26
      * @maxLength 26

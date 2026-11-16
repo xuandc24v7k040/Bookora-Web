@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import ReviewMediaGallery from "@/features/engagement/components/ReviewMediaGallery.vue";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -40,19 +41,23 @@ import {
 import { publishEngagementChange } from "@/features/engagement/state/engagement-sync";
 import { customerOrderKeys } from "@/features/orders/api/customer-orders-api";
 import { formatDateTime } from "@/lib/date-format";
+import { invalidateReviewProduct } from "@/features/engagement/state/review-invalidation";
 
 type ReviewTab = "pending" | "written";
 
 const route = useRoute();
 const router = useRouter();
 const activeTab = computed<ReviewTab>({
-  get: () => (firstQueryValue(route.query.tab) === "written" ? "written" : "pending"),
+  get: () =>
+    firstQueryValue(route.query.tab) === "written" ? "written" : "pending",
   set: (tab) => {
     if (tab === activeTab.value) return;
     void router.push({ query: { ...route.query, tab } });
   },
 });
-const orderId = computed(() => firstQueryValue(route.query.orderId) || undefined);
+const orderId = computed(
+  () => firstQueryValue(route.query.orderId) || undefined,
+);
 const page = ref(1);
 const pendingPage = ref(1);
 const dialogOpen = ref(false);
@@ -85,7 +90,15 @@ const pending = useQuery({
 });
 const remove = useMutation({
   mutationFn: deleteReview,
-  onSuccess: () => {
+  onSuccess: (_result, reviewId) => {
+    const product = mine.data.value?.items.find(
+      (item) => item.id === reviewId,
+    )?.product;
+    if (product) {
+      const changed = { productId: product.id, productSlug: product.slug };
+      invalidateReviewProduct(queryClient, changed);
+      publishEngagementChange(changed);
+    }
     if ((mine.data.value?.items.length ?? 0) <= 1 && page.value > 1) {
       page.value -= 1;
     }
@@ -96,7 +109,7 @@ const remove = useMutation({
     void queryClient.invalidateQueries({ queryKey: engagementKeys.dashboard });
     void queryClient.invalidateQueries({ queryKey: customerOrderKeys.all });
     void queryClient.invalidateQueries({ queryKey: customerOrderKeys.details });
-    publishEngagementChange();
+    if (!product) publishEngagementChange();
     toast.success("Đã xóa đánh giá.");
   },
   onError: () => toast.error("Không thể xóa đánh giá. Vui lòng thử lại."),
@@ -187,9 +200,7 @@ function clearOrderFilter(): void {
       v-if="orderId"
       class="flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-lg border bg-muted/30 px-4 py-3 text-sm"
     >
-      <p class="min-w-0 break-words">
-        Đang xem đánh giá của đơn hàng đã chọn.
-      </p>
+      <p class="min-w-0 break-words">Đang xem đánh giá của đơn hàng đã chọn.</p>
       <Button
         type="button"
         variant="outline"
@@ -243,7 +254,7 @@ function clearOrderFilter(): void {
         <Card v-else class="min-w-0 gap-0 overflow-hidden py-0 shadow-none">
           <article
             v-for="item in pending.data.value.items"
-            :key="`${item.orderId}-${item.product.id}`"
+            :key="item.orderItemId"
             class="grid min-w-0 gap-4 border-b p-4 last:border-0 sm:grid-cols-[4.5rem_minmax(0,1fr)] lg:grid-cols-[4.5rem_minmax(0,1.2fr)_minmax(12rem,0.9fr)_12rem] lg:items-center"
           >
             <img
@@ -263,6 +274,12 @@ function clearOrderFilter(): void {
                 class="line-clamp-2 break-words font-semibold [overflow-wrap:anywhere]"
               >
                 {{ item.product.name }}
+              </p>
+              <p
+                v-if="item.variantLabel"
+                class="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]"
+              >
+                <strong>Phân loại:</strong> {{ item.variantLabel }}
               </p>
             </div>
             <div class="min-w-0 border-l-0 text-sm lg:border-l lg:pl-6">
@@ -370,6 +387,12 @@ function clearOrderFilter(): void {
               >
                 Mã: {{ item.orderCode }}
               </p>
+              <p
+                v-if="item.variantLabel"
+                class="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]"
+              >
+                <strong>Phân loại:</strong> {{ item.variantLabel }}
+              </p>
             </div>
 
             <div
@@ -403,6 +426,7 @@ function clearOrderFilter(): void {
               >
                 {{ item.content?.trim() || "Không có nội dung đánh giá." }}
               </p>
+              <ReviewMediaGallery :media="item.media" />
               <Button
                 v-if="(item.content?.length ?? 0) > 140"
                 type="button"

@@ -29,6 +29,7 @@ export const StorefrontProductReviewsListQueryParams = zod.strictObject({
   "page": zod.number().min(1).default(storefrontProductReviewsListQueryPageDefault),
   "limit": zod.number().min(1).max(storefrontProductReviewsListQueryLimitMax).default(storefrontProductReviewsListQueryLimitDefault),
   "rating": zod.number().min(1).max(storefrontProductReviewsListQueryRatingMax).optional(),
-  "verifiedPurchase": zod.boolean().optional().describe('Chỉ lấy đánh giá từ lượt mua đã được xác minh')
+  "verifiedPurchase": zod.boolean().optional().describe('Chỉ lấy đánh giá từ lượt mua đã được xác minh'),
+  "hasImages": zod.boolean().optional().describe('Lọc đánh giá có hình ảnh')
 })
 

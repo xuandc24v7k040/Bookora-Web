@@ -25,4 +25,8 @@ rating?: number;
  * Chỉ lấy đánh giá từ lượt mua đã được xác minh
  */
 verifiedPurchase?: boolean;
+/**
+ * Lọc đánh giá có hình ảnh
+ */
+hasImages?: boolean;
 };

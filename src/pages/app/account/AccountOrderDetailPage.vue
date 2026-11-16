@@ -96,7 +96,7 @@ const reviewDialogOpen = ref(false);
 const selectedOpportunity = ref<PendingReviewOpportunityDto | null>(null);
 const pendingReviewParams = computed(() => ({
   page: 1,
-  limit: 50,
+  limit: 20,
   orderId: orderId.value,
 }));
 const pendingReviews = useQuery({
@@ -167,11 +167,17 @@ const money = new Intl.NumberFormat("vi-VN");
         <div class="mt-3 space-y-3">
           <div
             v-for="item in pendingReviews.data.value.items"
-            :key="item.product.id"
+            :key="item.orderItemId"
             class="flex items-center justify-between gap-4 border-t pt-3 first:border-0"
           >
             <div>
               <p class="font-medium">{{ item.product.name }}</p>
+              <p
+                v-if="item.variantLabel"
+                class="mt-1 break-words text-sm text-[var(--bookora-green)]"
+              >
+                Phân loại: {{ item.variantLabel }}
+              </p>
               <p class="text-xs text-muted-foreground">Đơn hàng đã hoàn tất</p>
             </div>
             <Button size="sm" @click="reviewProduct(item)"

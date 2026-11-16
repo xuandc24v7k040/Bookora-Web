@@ -111,4 +111,35 @@ describe("ImageDropzone", () => {
 
     expect(revokeObjectURL).toHaveBeenCalledWith("blob:preview");
   });
+
+  it("supports multiple review files with one shared validation path and remaining slots", async () => {
+    const wrapper = mount(ImageDropzone, {
+      props: { modelValue: null, multiple: true, maxFiles: 2, compact: true },
+    });
+    const files = ["one.png", "two.webp"].map(
+      (name) =>
+        new File(["image"], name, {
+          type: name.endsWith("png") ? "image/png" : "image/webp",
+        }),
+    );
+    const input = wrapper.get('input[type="file"]');
+    Object.defineProperty(input.element, "files", {
+      configurable: true,
+      value: files,
+    });
+    await input.trigger("change");
+    await flushPromises();
+    expect(wrapper.emitted("files")?.[0]).toEqual([files]);
+    expect(wrapper.emitted("update:modelValue")).toBeUndefined();
+    expect(wrapper.text()).toBe("Thêm ảnh");
+    expect(wrapper.emitted("validating")).toEqual([[true], [false]]);
+    await wrapper.setProps({ maxFiles: 1 });
+    await input.trigger("change");
+    await flushPromises();
+    expect(wrapper.emitted("files")).toHaveLength(1);
+    expect(wrapper.emitted("invalid")?.[0]).toEqual([
+      "Chỉ được chọn thêm tối đa 1 ảnh.",
+    ]);
+    wrapper.unmount();
+  });
 });

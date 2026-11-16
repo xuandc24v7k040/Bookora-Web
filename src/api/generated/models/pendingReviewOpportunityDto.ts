@@ -8,6 +8,9 @@
 import type { ReviewProductDto } from './reviewProductDto';
 
 export interface PendingReviewOpportunityDto {
+  orderItemId: string;
+  /** @nullable */
+  variantLabel: string | null;
   orderId: string;
   orderCode: string;
   product: ReviewProductDto;

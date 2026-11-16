@@ -4,6 +4,8 @@ import {
   customerReviewsList,
   customerReviewsPending,
   customerReviewsUpdate,
+  customerReviewImagesUpload,
+  customerReviewImagesDelete,
 } from "@/api/generated/endpoints/customer-reviews/customer-reviews";
 import {
   customerWishlistAdd,
@@ -98,6 +100,14 @@ export async function updateReview(reviewId: string, payload: UpdateReviewDto) {
 
 export async function deleteReview(reviewId: string) {
   return (await customerReviewsDelete(reviewId)).data;
+}
+
+export async function uploadReviewImages(reviewId: string, files: File[]) {
+  return (await customerReviewImagesUpload(reviewId, { files })).data;
+}
+
+export async function deleteReviewImage(reviewId: string, mediaId: string) {
+  return (await customerReviewImagesDelete(reviewId, mediaId)).data;
 }
 
 export async function getAccountDashboard(signal?: AbortSignal) {

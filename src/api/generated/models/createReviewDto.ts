@@ -7,6 +7,7 @@
  */
 
 export interface CreateReviewDto {
+  orderItemId: string;
   orderId: string;
   /**
      * @minLength 26

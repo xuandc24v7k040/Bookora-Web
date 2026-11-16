@@ -30,7 +30,10 @@ import type {
 
 import type {
   CreateReviewDto,
-  CustomerReviewsCreate200,
+  CustomerReviewImagesDelete200,
+  CustomerReviewImagesUpload201,
+  CustomerReviewImagesUploadBody,
+  CustomerReviewsCreate201,
   CustomerReviewsDelete200,
   CustomerReviewsList200,
   CustomerReviewsListParams,
@@ -50,6 +53,138 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
+ * Thêm ảnh cho đánh giá của tôi
+ * @summary Thêm ảnh cho đánh giá của tôi
+ */
+export const customerReviewImagesUpload = (
+    reviewId: MaybeRef<string>,
+    customerReviewImagesUploadBody: MaybeRef<CustomerReviewImagesUploadBody>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      reviewId = unref(reviewId);
+customerReviewImagesUploadBody = unref(customerReviewImagesUploadBody);
+      const formData = new FormData();
+customerReviewImagesUploadBody.files.forEach(value => formData.append(`files`, value));
+
+      return customInstance<CustomerReviewImagesUpload201>(
+      {url: `/account/reviews/${reviewId}/images`, method: 'POST',
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData, signal
+    },
+      options);
+    }
+
+
+
+export const getCustomerReviewImagesUploadMutationOptions = <TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof customerReviewImagesUpload>>, TError,{reviewId: string;data: BodyType<CustomerReviewImagesUploadBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof customerReviewImagesUpload>>, TError,{reviewId: string;data: BodyType<CustomerReviewImagesUploadBody>}, TContext> => {
+
+const mutationKey = ['customerReviewImagesUpload'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof customerReviewImagesUpload>>, {reviewId: string;data: BodyType<CustomerReviewImagesUploadBody>}> = (props) => {
+          const {reviewId,data} = props ?? {};
+
+          return  customerReviewImagesUpload(reviewId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CustomerReviewImagesUploadMutationResult = NonNullable<Awaited<ReturnType<typeof customerReviewImagesUpload>>>
+    export type CustomerReviewImagesUploadMutationBody = BodyType<CustomerReviewImagesUploadBody>
+    export type CustomerReviewImagesUploadMutationError = ErrorType<ErrorResponseDto>
+
+    /**
+ * @summary Thêm ảnh cho đánh giá của tôi
+ */
+export const useCustomerReviewImagesUpload = <TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof customerReviewImagesUpload>>, TError,{reviewId: string;data: BodyType<CustomerReviewImagesUploadBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof customerReviewImagesUpload>>,
+        TError,
+        {reviewId: string;data: BodyType<CustomerReviewImagesUploadBody>},
+        TContext
+      > => {
+      return useMutation(getCustomerReviewImagesUploadMutationOptions(options), queryClient);
+    }
+    /**
+ * Xóa ảnh khỏi đánh giá của tôi
+ * @summary Xóa ảnh khỏi đánh giá của tôi
+ */
+export const customerReviewImagesDelete = (
+    reviewId: MaybeRef<string>,
+    mediaId: MaybeRef<string>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      reviewId = unref(reviewId);
+mediaId = unref(mediaId);
+
+      return customInstance<CustomerReviewImagesDelete200>(
+      {url: `/account/reviews/${reviewId}/images/${mediaId}`, method: 'DELETE', signal
+    },
+      options);
+    }
+
+
+
+export const getCustomerReviewImagesDeleteMutationOptions = <TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof customerReviewImagesDelete>>, TError,{reviewId: string;mediaId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof customerReviewImagesDelete>>, TError,{reviewId: string;mediaId: string}, TContext> => {
+
+const mutationKey = ['customerReviewImagesDelete'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof customerReviewImagesDelete>>, {reviewId: string;mediaId: string}> = (props) => {
+          const {reviewId,mediaId} = props ?? {};
+
+          return  customerReviewImagesDelete(reviewId,mediaId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CustomerReviewImagesDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof customerReviewImagesDelete>>>
+
+    export type CustomerReviewImagesDeleteMutationError = ErrorType<ErrorResponseDto>
+
+    /**
+ * @summary Xóa ảnh khỏi đánh giá của tôi
+ */
+export const useCustomerReviewImagesDelete = <TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof customerReviewImagesDelete>>, TError,{reviewId: string;mediaId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof customerReviewImagesDelete>>,
+        TError,
+        {reviewId: string;mediaId: string},
+        TContext
+      > => {
+      return useMutation(getCustomerReviewImagesDeleteMutationOptions(options), queryClient);
+    }
+    /**
  * Đánh giá của tôi
  * @summary Đánh giá của tôi
  */
@@ -131,7 +266,7 @@ export const customerReviewsCreate = (
 ) => {
       createReviewDto = unref(createReviewDto);
 
-      return customInstance<CustomerReviewsCreate200>(
+      return customInstance<CustomerReviewsCreate201>(
       {url: `/account/reviews`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createReviewDto, signal
@@ -186,8 +321,8 @@ export const useCustomerReviewsCreate = <TError = ErrorType<ErrorResponseDto>,
       return useMutation(getCustomerReviewsCreateMutationOptions(options), queryClient);
     }
     /**
- * Các lượt Order + Product đang chờ đánh giá
- * @summary Các lượt Order + Product đang chờ đánh giá
+ * Các dòng hàng đã mua đang chờ đánh giá
+ * @summary Các dòng hàng đã mua đang chờ đánh giá
  */
 export const customerReviewsPending = (
     params?: MaybeRef<CustomerReviewsPendingParams>,
@@ -235,7 +370,7 @@ export type CustomerReviewsPendingQueryError = ErrorType<ErrorResponseDto>
 
 
 /**
- * @summary Các lượt Order + Product đang chờ đánh giá
+ * @summary Các dòng hàng đã mua đang chờ đánh giá
  */
 
 export function useCustomerReviewsPending<TData = Awaited<ReturnType<typeof customerReviewsPending>>, TError = ErrorType<ErrorResponseDto>>(

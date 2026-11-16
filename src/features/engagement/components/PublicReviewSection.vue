@@ -13,13 +13,15 @@ import {
 import type { StorefrontProductReviewsListParams } from "@/api/generated/models";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import ReviewMediaGallery from "./ReviewMediaGallery.vue";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { formatRelativeTime } from "@/lib/date-format";
 import { engagementKeys, listPublicReviews } from "../api/engagement-api";
 
-type ReviewFilter = "all" | "verified" | "5" | "4" | "3" | "2" | "1";
+type ReviewFilter = "all" | "images" | "5" | "4" | "3" | "2" | "1";
 const PUBLIC_REVIEW_PAGE_SIZE = 4;
 
 const props = defineProps<{ productId: string }>();
@@ -28,7 +30,7 @@ const filter = ref<ReviewFilter>("all");
 const expanded = ref<Set<string>>(new Set());
 const filters: Array<{ value: ReviewFilter; label: string }> = [
   { value: "all", label: "Tất cả" },
-  { value: "verified", label: "Đã mua hàng" },
+  { value: "images", label: "Có hình ảnh" },
   { value: "5", label: "5 sao" },
   { value: "4", label: "4 sao" },
   { value: "3", label: "3 sao" },
@@ -39,7 +41,7 @@ const params = computed<StorefrontProductReviewsListParams>(() => ({
   page: page.value,
   limit: PUBLIC_REVIEW_PAGE_SIZE,
   rating: /^[1-5]$/.test(filter.value) ? Number(filter.value) : undefined,
-  verifiedPurchase: filter.value === "verified" ? true : undefined,
+  hasImages: filter.value === "images" ? true : undefined,
 }));
 const query = useQuery({
   queryKey: computed(() =>
@@ -181,10 +183,7 @@ function toggle(id: string): void {
       >
         <LoaderCircle class="size-3.5 animate-spin" /> Đang cập nhật
       </div>
-      <div
-        v-if="query.isPending.value"
-        class="grid place-items-center py-12"
-      >
+      <div v-if="query.isPending.value" class="grid place-items-center py-12">
         <LoaderCircle class="size-7 animate-spin text-[var(--bookora-green)]" />
       </div>
       <div
@@ -258,6 +257,12 @@ function toggle(id: string): void {
               >
                 <CheckCircle2 class="size-4" /> Đã mua hàng
               </span>
+              <Badge
+                v-if="item.variantLabel"
+                variant="secondary"
+                class="h-auto max-w-full whitespace-normal break-words bg-[var(--bookora-green)]/5 text-[var(--bookora-green)] [overflow-wrap:anywhere]"
+                >Phân loại: {{ item.variantLabel }}</Badge
+              >
             </div>
             <p
               :class="!expanded.has(item.id) && 'line-clamp-4'"
@@ -274,15 +279,15 @@ function toggle(id: string): void {
             >
               {{ expanded.has(item.id) ? "Thu gọn" : "Xem thêm" }}
             </Button>
+            <ReviewMediaGallery :media="item.media" />
             <time
               :datetime="item.createdAt"
               class="mt-3 flex items-start gap-2 text-xs text-muted-foreground"
+              ><Clock3 class="mt-0.5 size-4 shrink-0" /><span
+                >Đánh giá được đăng
+                {{ formatRelativeTime(item.createdAt) }}</span
+              ></time
             >
-              <Clock3 class="mt-0.5 size-4 shrink-0" />
-              <span>
-                Đánh giá được đăng {{ formatRelativeTime(item.createdAt) }}
-              </span>
-            </time>
           </div>
         </article>
       </template>

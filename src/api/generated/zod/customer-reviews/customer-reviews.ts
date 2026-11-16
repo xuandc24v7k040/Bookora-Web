@@ -9,6 +9,31 @@ import * as zod from 'zod';
 
 
 /**
+ * Thêm ảnh cho đánh giá của tôi
+ * @summary Thêm ảnh cho đánh giá của tôi
+ */
+export const CustomerReviewImagesUploadParams = zod.strictObject({
+  "reviewId": zod.string()
+})
+
+export const customerReviewImagesUploadBodyFilesMax = 4;
+
+
+
+export const CustomerReviewImagesUploadBody = zod.strictObject({
+  "files": zod.array(zod.instanceof(File)).min(1).max(customerReviewImagesUploadBodyFilesMax)
+})
+
+/**
+ * Xóa ảnh khỏi đánh giá của tôi
+ * @summary Xóa ảnh khỏi đánh giá của tôi
+ */
+export const CustomerReviewImagesDeleteParams = zod.strictObject({
+  "reviewId": zod.string(),
+  "mediaId": zod.string()
+})
+
+/**
  * Đánh giá của tôi
  * @summary Đánh giá của tôi
  */
@@ -36,6 +61,7 @@ export const customerReviewsCreateBodyContentMax = 2000;
 
 
 export const CustomerReviewsCreateBody = zod.strictObject({
+  "orderItemId": zod.ulid(),
   "orderId": zod.ulid(),
   "productId": zod.ulid(),
   "rating": zod.number().min(1).max(customerReviewsCreateBodyRatingMax),
@@ -43,8 +69,8 @@ export const CustomerReviewsCreateBody = zod.strictObject({
 })
 
 /**
- * Các lượt Order + Product đang chờ đánh giá
- * @summary Các lượt Order + Product đang chờ đánh giá
+ * Các dòng hàng đã mua đang chờ đánh giá
+ * @summary Các dòng hàng đã mua đang chờ đánh giá
  */
 export const customerReviewsPendingQueryPageDefault = 1;
 

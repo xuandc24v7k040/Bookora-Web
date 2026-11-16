@@ -46,6 +46,9 @@ vi.mock("vue-sonner", () => ({
 
 const writtenReview = {
   id: "review-1",
+  orderItemId: "item-1",
+  variantLabel: null,
+  media: [],
   orderId: "order-1",
   orderCode: "BK-01",
   product: {
