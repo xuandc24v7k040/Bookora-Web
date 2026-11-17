@@ -12,8 +12,12 @@ import type { AdminOrderDetailDtoStatus } from './adminOrderDetailDtoStatus';
 import type { AdminOrderItemDto } from './adminOrderItemDto';
 import type { AdminOrderPaymentDto } from './adminOrderPaymentDto';
 import type { AdminOrderStatusHistoryDto } from './adminOrderStatusHistoryDto';
+import type { OrderCouponSnapshotDto } from './orderCouponSnapshotDto';
 
 export interface AdminOrderDetailDto {
+  orderCouponDiscountAmount: number;
+  shippingCouponDiscountAmount: number;
+  appliedCoupons: OrderCouponSnapshotDto[];
   /**
      * @minLength 26
      * @maxLength 26

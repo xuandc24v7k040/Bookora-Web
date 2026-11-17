@@ -561,6 +561,24 @@ function backToList(): void {
                   formatMoney(order.shippingFee)
                 }}</span>
               </div>
+              <div
+                v-if="order.orderCouponDiscountAmount"
+                class="flex justify-between gap-4 text-primary"
+              >
+                <span>Mã giảm giá đơn hàng</span
+                ><span
+                  >-{{ formatMoney(order.orderCouponDiscountAmount) }}</span
+                >
+              </div>
+              <div
+                v-if="order.shippingCouponDiscountAmount"
+                class="flex justify-between gap-4 text-primary"
+              >
+                <span>Mã giảm giá vận chuyển</span
+                ><span
+                  >-{{ formatMoney(order.shippingCouponDiscountAmount) }}</span
+                >
+              </div>
               <div class="flex items-end justify-between gap-4 border-t pt-4">
                 <span class="font-semibold">Tổng thanh toán</span
                 ><span class="text-lg font-bold text-primary tabular-nums">{{

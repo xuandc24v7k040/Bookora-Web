@@ -203,7 +203,9 @@ describe("Phase 15 checkout UI hotfix contract", () => {
     expect(checkoutSource).toContain('to="/cart"');
     expect(checkoutSource).toContain('aria-current="page"');
     expect(checkoutSource).toContain("py-2 sm:py-3");
-    expect(checkoutSource).not.toContain("ChevronRight");
+    const breadcrumb = checkoutSource.match(/<nav[\s\S]*?<\/nav>/)?.[0];
+    expect(breadcrumb).toBeDefined();
+    expect(breadcrumb).not.toContain("ChevronRight");
   });
 
   it("uses shadcn RadioGroup, the local payment asset, and neutral shipping wording", () => {

@@ -11,6 +11,24 @@ import type { SavedAddressInputDto } from './savedAddressInputDto';
 
 export interface PlaceOrderDto {
   /**
+     * Tra mã nhập tay, backend xác định loại và thay voucher cùng loại
+     * @minLength 3
+     * @maxLength 40
+     */
+  couponCode?: string;
+  /**
+     * @minLength 3
+     * @maxLength 40
+     */
+  orderCouponCode?: string;
+  /**
+     * @minLength 3
+     * @maxLength 40
+     */
+  shippingCouponCode?: string;
+  /** Liệt kê tối đa 100 voucher PUBLIC theo ngữ cảnh thanh toán */
+  includeCoupons?: boolean;
+  /**
      * @minItems 1
      * @maxItems 50
      */

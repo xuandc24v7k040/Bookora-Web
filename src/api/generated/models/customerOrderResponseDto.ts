@@ -12,8 +12,12 @@ import type { CustomerOrderResponseDtoPaymentMethod } from './customerOrderRespo
 import type { CustomerOrderResponseDtoPaymentStatus } from './customerOrderResponseDtoPaymentStatus';
 import type { CustomerOrderResponseDtoStatus } from './customerOrderResponseDtoStatus';
 import type { CustomerOrderReviewActionDto } from './customerOrderReviewActionDto';
+import type { OrderCouponSnapshotDto } from './orderCouponSnapshotDto';
 
 export interface CustomerOrderResponseDto {
+  orderCouponDiscountAmount: number;
+  shippingCouponDiscountAmount: number;
+  appliedCoupons: OrderCouponSnapshotDto[];
   /**
      * @minLength 26
      * @maxLength 26

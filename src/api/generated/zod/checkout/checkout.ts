@@ -16,6 +16,15 @@ export const CheckoutPreviewHeader = zod.strictObject({
   "X-Branch-Id": zod.ulid().describe('ULID chi nhánh đang được chọn. Bắt buộc với route cần selected branch.')
 })
 
+export const checkoutPreviewBodyCouponCodeMin = 3;
+export const checkoutPreviewBodyCouponCodeMax = 40;
+
+export const checkoutPreviewBodyOrderCouponCodeMin = 3;
+export const checkoutPreviewBodyOrderCouponCodeMax = 40;
+
+export const checkoutPreviewBodyShippingCouponCodeMin = 3;
+export const checkoutPreviewBodyShippingCouponCodeMax = 40;
+
 export const checkoutPreviewBodySelectedCartItemIdsMax = 50;
 
 export const checkoutPreviewBodyAddressTwoReceiverNameMin = 2;
@@ -43,6 +52,10 @@ export const checkoutPreviewBodyNoteMax = 200;
 
 
 export const CheckoutPreviewBody = zod.strictObject({
+  "couponCode": zod.string().min(checkoutPreviewBodyCouponCodeMin).max(checkoutPreviewBodyCouponCodeMax).optional().describe('Tra mã nhập tay, backend xác định loại và thay voucher cùng loại'),
+  "orderCouponCode": zod.string().min(checkoutPreviewBodyOrderCouponCodeMin).max(checkoutPreviewBodyOrderCouponCodeMax).optional(),
+  "shippingCouponCode": zod.string().min(checkoutPreviewBodyShippingCouponCodeMin).max(checkoutPreviewBodyShippingCouponCodeMax).optional(),
+  "includeCoupons": zod.boolean().optional().describe('Liệt kê tối đa 100 voucher PUBLIC theo ngữ cảnh thanh toán'),
   "selectedCartItemIds": zod.array(zod.ulid()).min(1).max(checkoutPreviewBodySelectedCartItemIdsMax),
   "address": zod.union([zod.strictObject({
   "source": zod.enum(['SAVED_ADDRESS']),
@@ -112,6 +125,15 @@ export const CheckoutPlaceOrderCodHeader = zod.strictObject({
   "X-Branch-Id": zod.ulid().describe('ULID chi nhánh đang được chọn. Bắt buộc với route cần selected branch.')
 })
 
+export const checkoutPlaceOrderCodBodyCouponCodeMin = 3;
+export const checkoutPlaceOrderCodBodyCouponCodeMax = 40;
+
+export const checkoutPlaceOrderCodBodyOrderCouponCodeMin = 3;
+export const checkoutPlaceOrderCodBodyOrderCouponCodeMax = 40;
+
+export const checkoutPlaceOrderCodBodyShippingCouponCodeMin = 3;
+export const checkoutPlaceOrderCodBodyShippingCouponCodeMax = 40;
+
 export const checkoutPlaceOrderCodBodySelectedCartItemIdsMax = 50;
 
 export const checkoutPlaceOrderCodBodyAddressTwoReceiverNameMin = 2;
@@ -145,6 +167,10 @@ export const checkoutPlaceOrderCodBodyPreviewReferenceMax = 64;
 
 
 export const CheckoutPlaceOrderCodBody = zod.strictObject({
+  "couponCode": zod.string().min(checkoutPlaceOrderCodBodyCouponCodeMin).max(checkoutPlaceOrderCodBodyCouponCodeMax).optional().describe('Tra mã nhập tay, backend xác định loại và thay voucher cùng loại'),
+  "orderCouponCode": zod.string().min(checkoutPlaceOrderCodBodyOrderCouponCodeMin).max(checkoutPlaceOrderCodBodyOrderCouponCodeMax).optional(),
+  "shippingCouponCode": zod.string().min(checkoutPlaceOrderCodBodyShippingCouponCodeMin).max(checkoutPlaceOrderCodBodyShippingCouponCodeMax).optional(),
+  "includeCoupons": zod.boolean().optional().describe('Liệt kê tối đa 100 voucher PUBLIC theo ngữ cảnh thanh toán'),
   "selectedCartItemIds": zod.array(zod.ulid()).min(1).max(checkoutPlaceOrderCodBodySelectedCartItemIdsMax),
   "address": zod.union([zod.strictObject({
   "source": zod.enum(['SAVED_ADDRESS']),
@@ -177,6 +203,15 @@ export const CheckoutPlaceOrderCodBody = zod.strictObject({
 export const CheckoutPlaceOrderVnpayHeader = zod.strictObject({
   "X-Branch-Id": zod.ulid().describe('ULID chi nhánh đang được chọn. Bắt buộc với route cần selected branch.')
 })
+
+export const checkoutPlaceOrderVnpayBodyCouponCodeMin = 3;
+export const checkoutPlaceOrderVnpayBodyCouponCodeMax = 40;
+
+export const checkoutPlaceOrderVnpayBodyOrderCouponCodeMin = 3;
+export const checkoutPlaceOrderVnpayBodyOrderCouponCodeMax = 40;
+
+export const checkoutPlaceOrderVnpayBodyShippingCouponCodeMin = 3;
+export const checkoutPlaceOrderVnpayBodyShippingCouponCodeMax = 40;
 
 export const checkoutPlaceOrderVnpayBodySelectedCartItemIdsMax = 50;
 
@@ -211,6 +246,10 @@ export const checkoutPlaceOrderVnpayBodyPreviewReferenceMax = 64;
 
 
 export const CheckoutPlaceOrderVnpayBody = zod.strictObject({
+  "couponCode": zod.string().min(checkoutPlaceOrderVnpayBodyCouponCodeMin).max(checkoutPlaceOrderVnpayBodyCouponCodeMax).optional().describe('Tra mã nhập tay, backend xác định loại và thay voucher cùng loại'),
+  "orderCouponCode": zod.string().min(checkoutPlaceOrderVnpayBodyOrderCouponCodeMin).max(checkoutPlaceOrderVnpayBodyOrderCouponCodeMax).optional(),
+  "shippingCouponCode": zod.string().min(checkoutPlaceOrderVnpayBodyShippingCouponCodeMin).max(checkoutPlaceOrderVnpayBodyShippingCouponCodeMax).optional(),
+  "includeCoupons": zod.boolean().optional().describe('Liệt kê tối đa 100 voucher PUBLIC theo ngữ cảnh thanh toán'),
   "selectedCartItemIds": zod.array(zod.ulid()).min(1).max(checkoutPlaceOrderVnpayBodySelectedCartItemIdsMax),
   "address": zod.union([zod.strictObject({
   "source": zod.enum(['SAVED_ADDRESS']),

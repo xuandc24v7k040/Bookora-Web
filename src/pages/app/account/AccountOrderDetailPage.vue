@@ -152,6 +152,50 @@ const money = new Intl.NumberFormat("vi-VN");
             </p>
           </div>
           <div>
+            <dl class="mb-3 space-y-1 text-sm">
+              <div class="flex justify-between gap-3">
+                <dt>Tạm tính</dt>
+                <dd>
+                  {{ money.format(orderQuery.data.value.subtotalAmount) }}đ
+                </dd>
+              </div>
+              <div class="flex justify-between gap-3">
+                <dt>Giảm giá</dt>
+                <dd>
+                  -{{ money.format(orderQuery.data.value.discountAmount) }}đ
+                </dd>
+              </div>
+              <div class="flex justify-between gap-3">
+                <dt>Phí vận chuyển</dt>
+                <dd>{{ money.format(orderQuery.data.value.shippingFee) }}đ</dd>
+              </div>
+              <div
+                v-if="orderQuery.data.value.orderCouponDiscountAmount"
+                class="flex justify-between gap-3 text-green-700"
+              >
+                <dt>Mã giảm giá đơn hàng</dt>
+                <dd>
+                  -{{
+                    money.format(
+                      orderQuery.data.value.orderCouponDiscountAmount,
+                    )
+                  }}đ
+                </dd>
+              </div>
+              <div
+                v-if="orderQuery.data.value.shippingCouponDiscountAmount"
+                class="flex justify-between gap-3 text-green-700"
+              >
+                <dt>Mã giảm giá vận chuyển</dt>
+                <dd>
+                  -{{
+                    money.format(
+                      orderQuery.data.value.shippingCouponDiscountAmount,
+                    )
+                  }}đ
+                </dd>
+              </div>
+            </dl>
             <p class="text-xs uppercase text-slate-400">Tổng thanh toán</p>
             <p class="mt-1 text-lg font-bold text-green-700">
               {{ money.format(orderQuery.data.value.totalAmount) }}đ
@@ -233,9 +277,7 @@ const money = new Intl.NumberFormat("vi-VN");
         <div>
           <h2 class="font-bold">Vận chuyển</h2>
           <p class="mt-2 text-sm">{{ orderQuery.data.value.branchName }}</p>
-          <p class="text-sm text-slate-500">
-            Giao hàng tiêu chuẩn
-          </p>
+          <p class="text-sm text-slate-500">Giao hàng tiêu chuẩn</p>
           <p class="mt-1 text-sm">
             Phí: {{ money.format(orderQuery.data.value.shippingFee) }}đ
           </p>

@@ -6,6 +6,7 @@ import {
   ClipboardList,
   Gauge,
   Package,
+  Ticket,
   Users,
 } from "@lucide/vue";
 import type { AuthMeResponseDtoType } from "@/api/generated/models";
@@ -23,6 +24,7 @@ interface AdminMenuRoute {
 }
 
 export interface AdminMenuItem {
+  superAdminOnly?: boolean;
   id: string;
   label: string;
   icon?: Component;
@@ -240,9 +242,23 @@ export const ADMIN_MENU: readonly AdminMenuItem[] = [
       },
     ],
   },
+  {
+    id: "promotions",
+    label: "Quản lý khuyến mãi",
+    icon: Ticket,
+    children: [
+      {
+        id: "coupons",
+        superAdminOnly: true,
+        label: "Mã khuyến mãi",
+        routeNames: { SYSTEM: "super-admin-coupons" },
+      },
+    ],
+  },
 ] as const;
 
 function isAllowed(item: AdminMenuItem, policy: PermissionPolicy): boolean {
+  if (item.superAdminOnly && !policy.isSuperAdmin) return false;
   const required = item.requiredPermissions ?? [];
   if (required.length === 0) return true;
   return item.permissionMode === "any"

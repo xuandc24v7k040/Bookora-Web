@@ -9,6 +9,8 @@ import {
   ShieldCheck,
   Truck,
   WalletCards,
+  Ticket,
+  ChevronRight,
 } from "@lucide/vue";
 import axios from "axios";
 import {
@@ -21,6 +23,8 @@ import {
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { toast } from "vue-sonner";
+import CheckoutCouponDialog from "@/features/coupons/components/CheckoutCouponDialog.vue";
+import { couponErrorMessage } from "@/features/coupons/coupon-utils";
 import type {
   CheckoutPreviewResponseDto,
   CheckoutItemResponseDto,
@@ -73,6 +77,11 @@ const paymentMethod = ref<PreviewCheckoutDtoPaymentMethod>(
   PreviewCheckoutDtoPaymentMethod.COD,
 );
 const note = ref("");
+const couponDialogOpen = ref(false);
+const couponNeedsConfirmation = ref(false);
+const couponSelection = ref<
+  Pick<PreviewCheckoutDto, "orderCouponCode" | "shippingCouponCode">
+>({});
 const addressInput = ref<
   SavedAddressInputDto | CurrentLocationAddressDto | null
 >(null);
@@ -128,6 +137,7 @@ const currentInputFingerprint = computed(() =>
     selectedCartItemIds: [...selectedCartItemIds.value].sort(),
     address: addressInput.value,
     paymentMethod: paymentMethod.value,
+    coupons: couponSelection.value,
   }),
 );
 const committedInputFingerprint = ref("");
@@ -141,6 +151,8 @@ const selectedAddressId = computed(() =>
     : "",
 );
 const placeOrderBlocker = computed(() => {
+  if (couponNeedsConfirmation.value)
+    return "Vui lòng chọn và xác nhận lại voucher.";
   if (selectedCartItemIds.value.length === 0)
     return "Vui lòng chọn ít nhất một sản phẩm.";
   if (!addressInput.value)
@@ -169,6 +181,7 @@ function shippingRouteLabel(routeType: string): string {
 
 function requestPayload(): PreviewCheckoutDto {
   return {
+    ...couponSelection.value,
     selectedCartItemIds: selectedCartItemIds.value,
     ...(addressInput.value ? { address: addressInput.value } : {}),
     paymentMethod: paymentMethod.value,
@@ -190,6 +203,8 @@ function checkoutErrorCode(error: unknown): string | undefined {
 }
 
 function checkoutErrorMessage(error: unknown): string {
+  if (checkoutErrorCode(error)?.startsWith("COUPON_"))
+    return couponErrorMessage(error);
   if (axios.isAxiosError(error) && error.response?.status === 401) {
     return "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
   }
@@ -222,7 +237,9 @@ function checkoutErrorMessage(error: unknown): string {
     CHECKOUT_SHIPPING_POLICY_UNAVAILABLE:
       "Chưa thể tính phí vận chuyển cho địa chỉ này.",
     CHECKOUT_PREVIEW_CHANGED:
-      "Phí vận chuyển đã thay đổi. Vui lòng kiểm tra lại đơn hàng.",
+      "Giá, phí vận chuyển hoặc voucher đã thay đổi. Vui lòng kiểm tra và xác nhận lại đơn hàng.",
+    VNPAY_INVALID_AMOUNT:
+      "VNPAY yêu cầu số tiền thanh toán lớn hơn 0đ. Vui lòng chọn phương thức thanh toán khác hoặc điều chỉnh voucher.",
   };
   return code
     ? (messages[code] ?? "Không thể cập nhật thông tin thanh toán.")
@@ -559,7 +576,12 @@ async function changePaymentMethod(value: string): Promise<void> {
 }
 
 async function placeOrder(): Promise<void> {
-  if (!draft.value?.canPlaceOrder || !addressInput.value || isBusy.value) {
+  if (
+    !draft.value?.canPlaceOrder ||
+    !addressInput.value ||
+    isBusy.value ||
+    placeOrderBlocker.value
+  ) {
     return;
   }
   isMutating.value = true;
@@ -589,13 +611,19 @@ async function placeOrder(): Promise<void> {
     const payment = await placeVnpayOrder(payload);
     window.location.assign(payment.paymentUrl);
   } catch (error: unknown) {
+    if (checkoutErrorCode(error)?.startsWith("COUPON_")) {
+      couponNeedsConfirmation.value = true;
+      couponDialogOpen.value = true;
+      toast.error(couponErrorMessage(error));
+      return;
+    }
     if (isAllItemsInvalidError(error)) {
       await redirectAllInvalid(requestedBranchName);
       return;
     }
     if (checkoutErrorCode(error) === "CHECKOUT_PREVIEW_CHANGED") {
       toast.warning(
-        "Phí vận chuyển đã thay đổi. Vui lòng kiểm tra lại đơn hàng.",
+        "Giá, phí vận chuyển hoặc voucher đã thay đổi. Vui lòng kiểm tra và xác nhận lại đơn hàng.",
         { id: "checkout-preview-changed" },
       );
       await refreshPreview();
@@ -614,6 +642,36 @@ async function placeOrder(): Promise<void> {
   } finally {
     isMutating.value = false;
   }
+}
+
+function confirmCoupons(preview: CheckoutPreviewResponseDto): void {
+  previewController?.abort();
+  ++previewSequence;
+  couponSelection.value = {
+    ...(preview.appliedCoupons.find((row) => row.type === "ORDER")
+      ? {
+          orderCouponCode: preview.appliedCoupons.find(
+            (row) => row.type === "ORDER",
+          )!.code,
+        }
+      : {}),
+    ...(preview.appliedCoupons.find((row) => row.type === "SHIPPING")
+      ? {
+          shippingCouponCode: preview.appliedCoupons.find(
+            (row) => row.type === "SHIPPING",
+          )!.code,
+        }
+      : {}),
+  };
+  draft.value = preview;
+  committedInputFingerprint.value = currentInputFingerprint.value;
+  couponNeedsConfirmation.value = false;
+  isPreviewPending.value = false;
+  toast.success(
+    preview.appliedCoupons.length
+      ? "Đã áp dụng voucher."
+      : "Đã bỏ chọn voucher.",
+  );
 }
 
 watch(
@@ -735,7 +793,7 @@ onBeforeUnmount(() => {
         v-else-if="draft"
         class="mt-6 grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(340px,0.9fr)]"
       >
-        <main class="space-y-5">
+        <main class="min-w-0 space-y-5">
           <section class="rounded-2xl border bg-white p-5 shadow-sm sm:p-6">
             <h2 class="flex items-center gap-3 text-lg font-bold">
               <span
@@ -745,7 +803,7 @@ onBeforeUnmount(() => {
               Địa chỉ giao hàng
             </h2>
             <label class="mt-5 block text-sm font-medium">Chọn địa chỉ</label>
-            <div class="mt-2 grid gap-2 sm:grid-cols-[1fr_auto]">
+            <div class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
               <CheckoutAddressCombobox
                 :addresses="addressesQuery.data.value ?? []"
                 :selected-id="selectedAddressId"
@@ -950,9 +1008,7 @@ onBeforeUnmount(() => {
                 <p>
                   Trọng lượng tính cước:
                   <strong>{{
-                    formatWeightGram(
-                      draft.shippingQuote.chargeableWeightGram,
-                    )
+                    formatWeightGram(draft.shippingQuote.chargeableWeightGram)
                   }}</strong>
                 </p>
                 <p>
@@ -989,7 +1045,7 @@ onBeforeUnmount(() => {
           </section>
         </main>
 
-        <aside class="space-y-5 lg:sticky lg:top-5">
+        <aside class="min-w-0 space-y-5 lg:sticky lg:top-5">
           <section class="rounded-2xl border bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
               <h2 class="text-lg font-bold">
@@ -1009,7 +1065,7 @@ onBeforeUnmount(() => {
               <li
                 v-for="item in draft.items"
                 :key="item.id"
-                class="grid grid-cols-[56px_1fr_auto] gap-3"
+                class="grid grid-cols-[56px_minmax(0,1fr)_auto] gap-3"
                 :class="{ 'opacity-65': !item.eligible }"
               >
                 <img
@@ -1051,6 +1107,22 @@ onBeforeUnmount(() => {
                 </strong>
               </li>
             </ul>
+            <button
+              type="button"
+              class="mt-4 flex w-full items-center gap-3 rounded-xl border border-[var(--bookora-green)]/20 bg-[var(--bookora-green)]/5 p-3 text-left transition-colors hover:bg-[var(--bookora-green)]/10 disabled:opacity-50"
+              :disabled="isBusy"
+              @click="couponDialogOpen = true"
+            >
+              <Ticket class="size-5 shrink-0 text-[var(--bookora-green)]" />
+              <span class="min-w-0 flex-1"
+                ><strong class="block text-sm">Mã giảm giá</strong
+                ><span class="block truncate text-xs text-muted-foreground">{{
+                  draft.appliedCoupons?.map((row) => row.code).join(" + ") ||
+                  "Chọn hoặc nhập mã giảm giá"
+                }}</span></span
+              >
+              <ChevronRight class="size-4 shrink-0" />
+            </button>
             <div class="mt-5 space-y-3 border-t pt-4 text-sm">
               <div class="flex justify-between">
                 <span>Tạm tính</span
@@ -1063,6 +1135,24 @@ onBeforeUnmount(() => {
               <div class="flex justify-between">
                 <span>Giảm giá</span
                 ><span>- {{ formatPrice(draft.discountAmount) }}</span>
+              </div>
+              <div
+                v-if="draft.orderCouponDiscountAmount"
+                class="flex justify-between gap-2 text-[var(--bookora-green)]"
+              >
+                <span>Mã giảm giá đơn hàng</span
+                ><span
+                  >-{{ formatPrice(draft.orderCouponDiscountAmount) }}</span
+                >
+              </div>
+              <div
+                v-if="draft.shippingCouponDiscountAmount"
+                class="flex justify-between gap-2 text-[var(--bookora-green)]"
+              >
+                <span>Mã giảm giá vận chuyển</span
+                ><span
+                  >-{{ formatPrice(draft.shippingCouponDiscountAmount) }}</span
+                >
               </div>
               <div class="flex justify-between border-t pt-4 text-lg">
                 <strong>Tổng thanh toán</strong>
@@ -1163,5 +1253,11 @@ onBeforeUnmount(() => {
         </aside>
       </div>
     </div>
+    <CheckoutCouponDialog
+      v-model:open="couponDialogOpen"
+      :context="requestPayload()"
+      :context-key="currentInputFingerprint"
+      @confirm="confirmCoupons"
+    />
   </div>
 </template>

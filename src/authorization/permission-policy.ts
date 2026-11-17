@@ -7,6 +7,7 @@ export interface AdminBranchAuthorizationContext {
 }
 
 export interface PermissionPolicy {
+  isSuperAdmin?: boolean
   permissions: ReadonlySet<string>
   can: (permission: AdminPermission) => boolean
   canAny: (permissions: readonly AdminPermission[]) => boolean
@@ -47,6 +48,7 @@ export function createPermissionPolicy(
   }
 
   return {
+    isSuperAdmin,
     permissions,
     can,
     canAny: (required) => required.length > 0 && required.some(can),

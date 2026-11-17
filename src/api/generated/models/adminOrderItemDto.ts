@@ -8,6 +8,7 @@
 import type { AdminOrderItemDtoVariantOptions } from './adminOrderItemDtoVariantOptions';
 
 export interface AdminOrderItemDto {
+  couponDiscountAmount: number;
   /**
      * @minLength 26
      * @maxLength 26

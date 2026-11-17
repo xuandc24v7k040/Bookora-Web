@@ -7,13 +7,19 @@
  */
 import type { CheckoutAddressResponseDto } from './checkoutAddressResponseDto';
 import type { CheckoutBranchResponseDto } from './checkoutBranchResponseDto';
+import type { CheckoutCouponDto } from './checkoutCouponDto';
 import type { CheckoutItemResponseDto } from './checkoutItemResponseDto';
 import type { CheckoutPreviewResponseDtoPaymentMethod } from './checkoutPreviewResponseDtoPaymentMethod';
 import type { CheckoutPreviewResponseDtoShippingFeeRule } from './checkoutPreviewResponseDtoShippingFeeRule';
 import type { CheckoutPreviewResponseDtoShippingMethodCode } from './checkoutPreviewResponseDtoShippingMethodCode';
+import type { OrderCouponSnapshotDto } from './orderCouponSnapshotDto';
 import type { ShippingQuoteResponseDto } from './shippingQuoteResponseDto';
 
 export interface CheckoutPreviewResponseDto {
+  orderCouponDiscountAmount: number;
+  shippingCouponDiscountAmount: number;
+  appliedCoupons: OrderCouponSnapshotDto[];
+  availableCoupons: CheckoutCouponDto[];
   /**
      * @minLength 64
      * @maxLength 64

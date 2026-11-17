@@ -8,6 +8,7 @@
 import type { CustomerOrderItemResponseDtoVariantOptionsItem } from './customerOrderItemResponseDtoVariantOptionsItem';
 
 export interface CustomerOrderItemResponseDto {
+  couponDiscountAmount: number;
   /**
      * @minLength 26
      * @maxLength 26
