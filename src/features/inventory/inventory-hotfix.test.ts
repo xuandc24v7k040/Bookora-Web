@@ -1,6 +1,7 @@
 import { AxiosError, AxiosHeaders } from "axios";
 import { describe, expect, it } from "vitest";
 import detailSource from "./pages/StockReceiptDetailPage.vue?raw";
+import pickerSource from "@/components/shared/ProductVariantSelectionList.vue?raw";
 import formSource from "./pages/StockReceiptFormPage.vue?raw";
 import listSource from "./pages/StockReceiptListPage.vue?raw";
 import stocksSource from "./pages/InventoryStocksPage.vue?raw";
@@ -109,8 +110,8 @@ describe("inventory hotfix contract", () => {
     );
     expect(formSource).toContain("show-scroll-buttons");
     expect(formSource).not.toMatch(/DialogFooter[^>]*absolute/);
-    expect(formSource).toContain("<Collapsible");
-    expect(formSource).toContain('v-for="group in variantGroups"');
+    expect(pickerSource).toContain("<Collapsible");
+    expect(pickerSource).toContain('v-for="group in variantGroups"');
     expect(formSource).toContain("optionSummary");
     expect(formSource).toContain(
       'next.note = "Vui lòng nhập ghi chú phiếu nhập."',
@@ -121,7 +122,7 @@ describe("inventory hotfix contract", () => {
       "if (note.value.trim()) delete errors.value.note;",
     );
     expect(formSource).toContain('@input="clearNoteError"');
-    expect(formSource).toContain('class="ml-auto shrink-0 shadow-sm"');
+    expect(pickerSource).toContain('class="ml-auto shrink-0 shadow-sm');
     expect(formSource).toContain("<VndMoneyInput");
     expect(formSource).toContain('placeholder="Không bắt buộc"');
     expect(formSource).toContain(
@@ -130,17 +131,17 @@ describe("inventory hotfix contract", () => {
     expect(formSource).not.toContain(
       "size-5 shrink-0 border-2 border-primary/70",
     );
-    expect(formSource.match(/<Checkbox/g)).toHaveLength(2);
+    expect(pickerSource.match(/<Checkbox/g)).toHaveLength(2);
   });
 
   it("shows branch current stock only on selectable variant rows", () => {
-    expect(formSource.match(/Tồn hiện tại:/g)).toHaveLength(2);
-    expect(formSource).toContain("group.variants[0].currentStock");
-    expect(formSource).toContain("variant.currentStock");
+    expect(pickerSource.match(/\{\{ stockLabel \}\}:/g)).toHaveLength(2);
+    expect(pickerSource).toContain("group.variants[0].currentStock");
+    expect(pickerSource).toContain("variant.currentStock");
 
-    const parentTrigger = formSource.slice(
-      formSource.indexOf("<CollapsibleTrigger"),
-      formSource.indexOf("</CollapsibleTrigger>"),
+    const parentTrigger = pickerSource.slice(
+      pickerSource.indexOf("<CollapsibleTrigger"),
+      pickerSource.indexOf("</CollapsibleTrigger>"),
     );
     expect(parentTrigger).not.toContain("currentStock");
   });

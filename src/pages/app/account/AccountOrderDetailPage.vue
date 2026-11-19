@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeft, Ban, LoaderCircle, PackageCheck } from "@lucide/vue";
+import { ArrowLeft, Ban, LoaderCircle, PackageCheck, Zap } from "@lucide/vue";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
@@ -257,6 +257,13 @@ const money = new Intl.NumberFormat("vi-VN");
             <div class="min-w-0 flex-1">
               <strong>{{ item.productName }}</strong>
               <p class="text-sm text-slate-500">{{ item.variantLabel }}</p>
+              <p
+                v-if="item.flashSaleItemId"
+                class="mt-1 inline-flex items-center gap-1 text-xs text-green-800"
+              >
+                <Zap class="size-3" />Flash Sale ·
+                {{ money.format(item.unitPrice) }}đ/sản phẩm
+              </p>
               <p class="mt-1 text-sm">Số lượng: {{ item.quantity }}</p>
             </div>
             <strong>{{ money.format(item.lineTotal) }}đ</strong>

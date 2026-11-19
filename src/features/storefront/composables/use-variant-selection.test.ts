@@ -54,6 +54,26 @@ function product(variants: PublicVariantDto[]): PublicProductDetailDto {
 }
 
 describe("useVariantSelection", () => {
+  it("opens the exact Flash Sale variant even when the selected branch is out of stock", async () => {
+    const currentProduct = ref(
+      product([variant("hard", true), variant("soft", false)]),
+    );
+    const quantities = ref({ hard: 5, soft: 0 });
+    const preferred = ref<string | null>("soft");
+    const selection = useVariantSelection(
+      currentProduct,
+      quantities,
+      preferred,
+    );
+    expect(selection.selectedVariantId.value).toBe("soft");
+    quantities.value = { hard: 4, soft: 0 };
+    await nextTick();
+    expect(selection.selectedVariantId.value).toBe("soft");
+    preferred.value = null;
+    selection.selectVariant("hard");
+    await nextTick();
+    expect(selection.selectedVariantId.value).toBe("hard");
+  });
   it("keeps, reconciles, and clears the selected variant as branch stock changes", async () => {
     const hard = variant("hard", true);
     const soft = variant("soft", false);

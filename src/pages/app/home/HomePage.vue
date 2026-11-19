@@ -2,6 +2,7 @@
 import BookSection from "@/components/client/home/BookSection.vue";
 import HomeCategoryStrip from "@/components/client/home/HomeCategoryStrip.vue";
 import HomeHero from "@/components/client/home/HomeHero.vue";
+import HomeFlashSale from "@/features/flash-sales/components/HomeFlashSale.vue";
 import MemberPromotionCard from "@/components/client/home/MemberPromotionCard.vue";
 import UpcomingBooksSection from "@/components/client/home/UpcomingBooksSection.vue";
 import RecentlyViewedSection from "@/features/storefront/components/RecentlyViewedSection.vue";
@@ -51,6 +52,7 @@ const categoryItems = computed(() => [
       >
     </div>
 
+    <HomeFlashSale />
     <RecentlyViewedSection
       subtitle="Tiếp tục xem những sản phẩm bạn đã quan tâm"
     />

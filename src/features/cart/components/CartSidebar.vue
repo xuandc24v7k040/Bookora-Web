@@ -140,7 +140,8 @@ const commitments = [
         <strong class="text-2xl text-red-600">{{ formatPrice(total) }}</strong>
       </div>
       <p class="mt-1 text-xs text-[var(--bookora-muted)]">
-        Đã bao gồm VAT (nếu có)
+        Giá dự kiến, đã bao gồm VAT (nếu có). Chưa giữ suất Flash Sale; giá được
+        xác nhận lại khi thanh toán.
       </p>
       <Button
         type="button"

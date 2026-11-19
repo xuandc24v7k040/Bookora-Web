@@ -42,6 +42,7 @@ const navigationLinks: HeaderLink[] = [
   { label: "Tác giả", href: "/san-pham" },
   { label: "Nhà xuất bản", href: "/san-pham" },
   { label: "Khuyến mãi", href: "/san-pham?onSale=true" },
+  { label: "Flash Sale", href: "/flash-sale" },
 ];
 const router = useRouter();
 const route = useRoute();
@@ -390,7 +391,9 @@ async function openCart(): Promise<void> {
       </div>
 
       <div class="grid gap-3 py-3 lg:hidden">
-        <div class="grid grid-cols-[auto_1fr_auto_auto] items-center gap-2">
+        <div
+          class="grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-2"
+        >
           <MobileCategorySheet
             :categories="categoriesQuery.data.value ?? []"
             :links="navigationLinks"
@@ -398,7 +401,10 @@ async function openCart(): Promise<void> {
             :account-label="accountPrimaryLabel"
           />
 
-          <ClientBrand compact />
+          <ClientBrand
+            compact
+            class="min-w-0 max-[360px]:gap-1 max-[360px]:[&_svg]:size-6 max-[360px]:[&_span]:text-sm max-[300px]:[&>span]:hidden"
+          />
 
           <button
             type="button"

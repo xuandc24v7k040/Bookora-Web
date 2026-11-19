@@ -25,9 +25,12 @@ import { storefrontErrorMessage } from "@/features/storefront/utils/storefront-e
 import { buildPrimaryCategoryBreadcrumb } from "@/features/storefront/utils/product-breadcrumb";
 import { useStorefrontBranchStore } from "@/stores/storefront-branch.store";
 import { useAuthStore } from "@/stores/auth.store";
+import { prepareBuyNow } from "@/features/cart/buy-now";
 import { useCartActions } from "@/features/cart/api/cart-api";
 import { cartErrorMessage } from "@/features/cart/utils/cart-error";
 import { resolveProductMetadata } from "@/features/storefront/utils/resolved-product-metadata";
+import { useFlashEligibility } from "@/features/flash-sales/api/flash-sale-api";
+import FlashSalePriceBox from "@/features/flash-sales/components/FlashSalePriceBox.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -63,8 +66,21 @@ const availabilityState = computed<"loading" | "error" | "success">(() =>
       ? "success"
       : "loading",
 );
+const preferredVariantId = ref<string | null>(
+  typeof route.query.variant === "string" ? route.query.variant : null,
+);
+watch(
+  () => route.query.variant,
+  (value) => {
+    preferredVariantId.value = typeof value === "string" ? value : null;
+  },
+);
 const { selectedVariantId, selectedVariant, displayedVariant, selectVariant } =
-  useVariantSelection(product, variantQuantities);
+  useVariantSelection(product, variantQuantities, preferredVariantId);
+function chooseVariant(id: string) {
+  preferredVariantId.value = null;
+  selectVariant(id);
+}
 const selectedAvailability = computed(() =>
   availabilityQuery.data.value?.variants.find(
     (variant) => variant.variantId === selectedVariantId.value,
@@ -80,6 +96,35 @@ const canOrder = computed(
     availableQuantity.value > 0,
 );
 const quantity = ref(1);
+const flashQuery = useFlashEligibility(
+  computed(() => displayedVariant.value?.id ?? ""),
+  computed(() =>
+    authStore.user?.type === "CUSTOMER" ? authStore.user.id : undefined,
+  ),
+);
+const flashExpired = ref(false);
+const flashOffer = computed(() =>
+  flashQuery.isSuccess.value && !flashExpired.value
+    ? (flashQuery.data.value?.offer ?? null)
+    : null,
+);
+const activeFlashOffer = computed(() =>
+  flashOffer.value &&
+  flashOffer.value.userRemaining > 0 &&
+  flashOffer.value.remaining > 0
+    ? flashOffer.value
+    : null,
+);
+watch(
+  () => flashQuery.data.value,
+  () => {
+    flashExpired.value = false;
+  },
+);
+function expireFlash() {
+  flashExpired.value = true;
+  void flashQuery.refetch();
+}
 const cartPending = ref(false);
 const activeTab = ref<"description" | "details" | "reviews">("description");
 const priceFormatter = new Intl.NumberFormat("vi-VN");
@@ -121,11 +166,12 @@ function formatPrice(value: number): string {
 }
 
 async function addToCart(buyNow = false): Promise<void> {
+  if (cartPending.value) return;
   if (authStore.user?.type !== "CUSTOMER") {
     toast.info("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.");
     await router.push({
       path: "/login",
-      query: { returnTo: `/san-pham/${slug.value}` },
+      query: { returnTo: route.fullPath },
     });
     return;
   }
@@ -141,6 +187,28 @@ async function addToCart(buyNow = false): Promise<void> {
 
   cartPending.value = true;
   try {
+    if (buyNow && activeFlashOffer.value) {
+      const branchId = branchStore.selectedBranchId;
+      const variantId = selectedVariant.value.id;
+      const navigation = await prepareBuyNow(
+        cartActions,
+        variantId,
+        quantity.value,
+        branchId,
+        activeFlashOffer.value?.itemId,
+      );
+      if (
+        branchStore.selectedBranchId !== branchId ||
+        selectedVariant.value?.id !== variantId
+      ) {
+        toast.info(
+          "Chi nhánh hoặc phiên bản đã thay đổi. Vui lòng kiểm tra và bấm mua lại.",
+        );
+        return;
+      }
+      await router.push(navigation);
+      return;
+    }
     await cartActions.add(
       {
         productVariantId: selectedVariant.value.id,
@@ -254,7 +322,12 @@ async function addToCart(buyNow = false): Promise<void> {
               >({{ product.reviewCount }})</span
             >
           </p>
-          <div class="mt-5 flex flex-wrap items-baseline gap-3">
+          <FlashSalePriceBox
+            v-if="activeFlashOffer"
+            :offer="activeFlashOffer"
+            @expired="expireFlash"
+          />
+          <div v-else class="mt-5 flex flex-wrap items-baseline gap-3">
             <strong class="text-3xl text-red-600">{{
               formatPrice(displayedVariant.price.current)
             }}</strong
@@ -268,6 +341,24 @@ async function addToCart(buyNow = false): Promise<void> {
               >-{{ displayedVariant.price.discountPercent }}%</span
             >
           </div>
+          <p
+            v-if="flashOffer && !activeFlashOffer"
+            class="mt-2 text-sm text-muted-foreground"
+          >
+            {{
+              flashOffer.remaining === 0
+                ? "Ưu đãi đã hết suất."
+                : "Bạn đã dùng hết giới hạn Flash Sale."
+            }}
+            Bạn có thể mua với giá thường.
+          </p>
+          <p
+            v-if="activeFlashOffer && quantity > activeFlashOffer.userRemaining"
+            class="mt-2 text-sm text-amber-800"
+          >
+            Bạn còn {{ activeFlashOffer.userRemaining }} suất ưu đãi. Khi thanh
+            toán, chọn giảm số lượng hoặc mua toàn bộ với giá thường.
+          </p>
           <p
             v-if="product.releaseDate"
             class="mt-2 text-sm text-[var(--bookora-green)]"
@@ -288,7 +379,7 @@ async function addToCart(buyNow = false): Promise<void> {
                 :model-value="selectedVariantId"
                 :variant-quantities="variantQuantities"
                 :availability-state="availabilityState"
-                @update:model-value="selectVariant"
+                @update:model-value="chooseVariant"
               />
             </div>
             <p v-else class="mt-6 text-sm">
@@ -330,10 +421,18 @@ async function addToCart(buyNow = false): Promise<void> {
               ><ShoppingCart class="size-5" /> Thêm vào giỏ hàng</Button
             ><Button
               type="button"
-              class="h-12 bg-red-600 text-white hover:bg-red-700"
+              class="h-12 text-white"
+              :class="
+                activeFlashOffer
+                  ? 'bg-green-800 hover:bg-green-900'
+                  : 'bg-red-600 hover:bg-red-700'
+              "
               :disabled="!canOrder || cartPending"
               @click="addToCart(true)"
-              ><Zap class="size-5" /> Mua ngay</Button
+              ><Zap class="size-5" />
+              {{
+                activeFlashOffer ? "Mua ngay giá Flash Sale" : "Mua ngay"
+              }}</Button
             >
           </div>
         </section>

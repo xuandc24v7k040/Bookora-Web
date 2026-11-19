@@ -4,6 +4,9 @@ import { mount, RouterLinkStub } from "@vue/test-utils";
 import { createPinia } from "pinia";
 import { describe, expect, it, vi } from "vitest";
 import HomePage from "@/pages/app/home/HomePage.vue";
+vi.mock("@/features/flash-sales/components/HomeFlashSale.vue", () => ({
+  default: { template: '<section data-test="flash-sale" />' },
+}));
 
 vi.mock("embla-carousel-vue", async () => {
   const { ref } = await import("vue");

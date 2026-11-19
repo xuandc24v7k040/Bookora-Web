@@ -17,6 +17,12 @@ export const clientRoutes: RouteRecordRaw[] = [
         component: () => import("@/pages/app/catalog/BookListPage.vue"),
       },
       {
+        path: "flash-sale",
+        name: "client-flash-sale",
+        component: () =>
+          import("@/features/flash-sales/pages/FlashSalePage.vue"),
+      },
+      {
         path: "san-pham/:slug",
         name: "client-book-detail",
         component: () => import("@/pages/app/catalog/BookDetailPage.vue"),

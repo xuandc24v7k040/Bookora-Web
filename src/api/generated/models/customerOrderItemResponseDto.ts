@@ -8,6 +8,12 @@
 import type { CustomerOrderItemResponseDtoVariantOptionsItem } from './customerOrderItemResponseDtoVariantOptionsItem';
 
 export interface CustomerOrderItemResponseDto {
+  /** @nullable */
+  catalogEffectivePrice?: number | null;
+  /** @nullable */
+  flashPrice?: number | null;
+  /** @nullable */
+  flashSaleItemId?: string | null;
   couponDiscountAmount: number;
   /**
      * @minLength 26

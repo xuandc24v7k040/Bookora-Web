@@ -10,6 +10,7 @@ import {
   RefreshCcw,
   UserRound,
   WalletCards,
+  Zap,
 } from "@lucide/vue";
 import { toast } from "vue-sonner";
 import { useRoute, useRouter } from "vue-router";
@@ -385,6 +386,12 @@ function backToList(): void {
                       <tr v-for="item in order.items" :key="item.id">
                         <td class="px-4 py-4">
                           <p class="font-medium">{{ item.productName }}</p>
+                          <p
+                            v-if="item.flashSaleItemId"
+                            class="mt-1 inline-flex items-center gap-1 text-xs text-green-800"
+                          >
+                            <Zap class="size-3" />Flash Sale
+                          </p>
                           <p class="mt-1 text-xs text-muted-foreground">
                             {{ item.variantLabel
                             }}<span v-if="item.sku"> · SKU {{ item.sku }}</span>

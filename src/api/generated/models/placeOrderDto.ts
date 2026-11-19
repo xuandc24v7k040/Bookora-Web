@@ -11,6 +11,11 @@ import type { SavedAddressInputDto } from './savedAddressInputDto';
 
 export interface PlaceOrderDto {
   /**
+     * Các CartItem khách xác nhận mua toàn bộ với giá catalog, không hưởng Flash Sale
+     * @maxItems 50
+     */
+  regularPriceCartItemIds?: string[];
+  /**
      * Tra mã nhập tay, backend xác định loại và thay voucher cùng loại
      * @minLength 3
      * @maxLength 40

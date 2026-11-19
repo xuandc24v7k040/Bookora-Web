@@ -24,6 +24,9 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 import CheckoutCouponDialog from "@/features/coupons/components/CheckoutCouponDialog.vue";
+import { needsFlashConfirmation } from "@/features/cart/buy-now";
+import FlashPurchaseChoiceDialog from "@/features/flash-sales/components/FlashPurchaseChoiceDialog.vue";
+import { useCartActions } from "@/features/cart/api/cart-api";
 import { couponErrorMessage } from "@/features/coupons/coupon-utils";
 import type {
   CheckoutPreviewResponseDto,
@@ -64,6 +67,14 @@ const selectedCartItemIds = computed(() =>
   parseCheckoutCartItemIds(route.query.items),
 );
 const draft = ref<CheckoutPreviewResponseDto | null>(null);
+const regularPriceCartItemIds = ref<string[]>([]);
+const flashChoice = ref<{
+  cartItemId: string;
+  allowedQuantity: number;
+  requestedQuantity: number;
+} | null>(null);
+const flashChoicePending = ref(false);
+const cartActions = useCartActions();
 const isLoading = ref(true);
 const isMutating = ref(false);
 const isPreviewPending = ref(false);
@@ -138,6 +149,7 @@ const currentInputFingerprint = computed(() =>
     address: addressInput.value,
     paymentMethod: paymentMethod.value,
     coupons: couponSelection.value,
+    regularPriceCartItemIds: [...regularPriceCartItemIds.value].sort(),
   }),
 );
 const committedInputFingerprint = ref("");
@@ -150,7 +162,24 @@ const selectedAddressId = computed(() =>
     ? addressInput.value.customerAddressId
     : "",
 );
+const acceptedFlashChange = ref(false);
+const flashIntentChanged = computed(() =>
+  needsFlashConfirmation(
+    route.query.flashOffer,
+    draft.value,
+    acceptedFlashChange.value,
+  ),
+);
+watch(
+  () => route.query.flashOffer,
+  () => {
+    acceptedFlashChange.value = false;
+    regularPriceCartItemIds.value = [];
+  },
+);
 const placeOrderBlocker = computed(() => {
+  if (flashIntentChanged.value)
+    return "Ưu đãi Flash Sale đã thay đổi. Vui lòng xác nhận giá mới trước khi đặt hàng.";
   if (couponNeedsConfirmation.value)
     return "Vui lòng chọn và xác nhận lại voucher.";
   if (selectedCartItemIds.value.length === 0)
@@ -181,12 +210,76 @@ function shippingRouteLabel(routeType: string): string {
 
 function requestPayload(): PreviewCheckoutDto {
   return {
+    regularPriceCartItemIds: regularPriceCartItemIds.value,
     ...couponSelection.value,
     selectedCartItemIds: selectedCartItemIds.value,
     ...(addressInput.value ? { address: addressInput.value } : {}),
     paymentMethod: paymentMethod.value,
     ...(note.value.trim() ? { note: note.value.trim() } : {}),
   } satisfies PreviewCheckoutDto;
+}
+
+function handleFlashChoice(error: unknown): boolean {
+  if (!axios.isAxiosError<{ code?: string; details?: unknown }>(error))
+    return false;
+  if (
+    !["FLASH_SALE_QUOTA_EXHAUSTED", "FLASH_SALE_USER_LIMIT"].includes(
+      error.response?.data.code ?? "",
+    )
+  )
+    return false;
+  const value = error.response?.data.details;
+  if (
+    !value ||
+    typeof value !== "object" ||
+    !("cartItemId" in value) ||
+    typeof value.cartItemId !== "string" ||
+    !selectedCartItemIds.value.includes(value.cartItemId) ||
+    !("allowedQuantity" in value) ||
+    typeof value.allowedQuantity !== "number" ||
+    !Number.isSafeInteger(value.allowedQuantity) ||
+    value.allowedQuantity < 0 ||
+    !("requestedQuantity" in value) ||
+    typeof value.requestedQuantity !== "number" ||
+    !Number.isSafeInteger(value.requestedQuantity) ||
+    value.requestedQuantity < 1
+  )
+    return false;
+  draft.value = null;
+  flashChoice.value = {
+    cartItemId: value.cartItemId,
+    allowedQuantity: value.allowedQuantity,
+    requestedQuantity: value.requestedQuantity,
+  };
+  return true;
+}
+async function resolveFlashChoice(regular: boolean) {
+  const choice = flashChoice.value;
+  if (!choice || flashChoicePending.value) return;
+  flashChoicePending.value = true;
+  try {
+    if (regular)
+      regularPriceCartItemIds.value = [
+        ...new Set([...regularPriceCartItemIds.value, choice.cartItemId]),
+      ];
+    else {
+      await cartActions.update(choice.cartItemId, {
+        quantity: choice.allowedQuantity,
+      });
+      regularPriceCartItemIds.value = regularPriceCartItemIds.value.filter(
+        (id) => id !== choice.cartItemId,
+      );
+    }
+    flashChoice.value = null;
+    await loadPreview();
+    toast.info(
+      "Đã tính lại đơn hàng. Vui lòng kiểm tra tổng tiền và voucher trước khi đặt.",
+    );
+  } catch (error) {
+    if (!handleFlashChoice(error)) toast.error(checkoutErrorMessage(error));
+  } finally {
+    flashChoicePending.value = false;
+  }
 }
 
 function isCanceledRequest(error: unknown): boolean {
@@ -327,6 +420,13 @@ async function loadPreview(): Promise<void> {
     ) {
       return;
     }
+    if (handleFlashChoice(error)) return;
+    if (checkoutErrorCode(error)?.startsWith("COUPON_")) {
+      couponNeedsConfirmation.value = true;
+      couponDialogOpen.value = true;
+      toast.error(couponErrorMessage(error));
+      return;
+    }
     if (isAllItemsInvalidError(error)) {
       await redirectAllInvalid(requestedBranchName);
       return;
@@ -370,6 +470,7 @@ async function refreshPreview(): Promise<void> {
     ) {
       return;
     }
+    if (handleFlashChoice(error)) return;
     throw error;
   } finally {
     if (sequence === previewSequence) isPreviewPending.value = false;
@@ -617,6 +718,7 @@ async function placeOrder(): Promise<void> {
       toast.error(couponErrorMessage(error));
       return;
     }
+    if (handleFlashChoice(error)) return;
     if (isAllItemsInvalidError(error)) {
       await redirectAllInvalid(requestedBranchName);
       return;
@@ -755,6 +857,15 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <FlashPurchaseChoiceDialog
+    :open="flashChoice !== null"
+    :allowed="flashChoice?.allowedQuantity ?? 0"
+    :requested="flashChoice?.requestedQuantity ?? 0"
+    :pending="flashChoicePending"
+    @reduce="resolveFlashChoice(false)"
+    @regular="resolveFlashChoice(true)"
+    @cancel="router.push('/cart')"
+  />
   <div class="w-full min-w-0 bg-slate-50/60 py-2 sm:py-3">
     <div class="w-full">
       <nav
@@ -784,6 +895,23 @@ onBeforeUnmount(() => {
         Thông tin của bạn được bảo mật và chỉ dùng để xử lý đơn hàng.
       </div>
 
+      <div
+        v-if="flashIntentChanged"
+        role="alert"
+        class="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm"
+      >
+        <p>
+          Ưu đãi Flash Sale đã hết hoặc thay đổi. Vui lòng kiểm tra giá mới; đơn
+          hàng chưa được đặt.
+        </p>
+        <Button
+          class="mt-3"
+          variant="outline"
+          :disabled="isBusy || previewDirty"
+          @click="acceptedFlashChange = true"
+          >Xác nhận giá mới</Button
+        >
+      </div>
       <div v-if="isLoading" class="mt-6 grid gap-5 lg:grid-cols-[1.5fr_0.9fr]">
         <Skeleton class="h-[720px] rounded-2xl" />
         <Skeleton class="h-[620px] rounded-2xl" />
@@ -803,7 +931,9 @@ onBeforeUnmount(() => {
               Địa chỉ giao hàng
             </h2>
             <label class="mt-5 block text-sm font-medium">Chọn địa chỉ</label>
-            <div class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <div
+              class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]"
+            >
               <CheckoutAddressCombobox
                 :addresses="addressesQuery.data.value ?? []"
                 :selected-id="selectedAddressId"

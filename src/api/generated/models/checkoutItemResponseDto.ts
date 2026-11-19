@@ -8,6 +8,9 @@
 import type { CheckoutVariantOptionDto } from './checkoutVariantOptionDto';
 
 export interface CheckoutItemResponseDto {
+  /** @nullable */
+  flashSaleItemId?: string | null;
+  catalogEffectivePrice?: number;
   /**
      * @minLength 26
      * @maxLength 26

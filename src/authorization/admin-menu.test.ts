@@ -3,6 +3,7 @@ import type { AuthMeResponseDto } from "@/api/generated/models";
 import {
   resolveFirstAllowedAdminRoute,
   resolveVisibleAdminMenu,
+  ADMIN_MENU,
 } from "@/authorization/admin-menu";
 import { ADMIN_PERMISSIONS } from "@/authorization/admin-permissions";
 import { createPermissionPolicy } from "@/authorization/permission-policy";
@@ -33,6 +34,42 @@ function visibleIds(
 }
 
 describe("admin menu and safe landing", () => {
+  it("places the single SUPER_ADMIN Flash Sale entry beside Coupon under promotions", () => {
+    const entries = ADMIN_MENU.flatMap((group) => group.children ?? []);
+    expect(entries.filter((item) => item.id === "flash-sales")).toHaveLength(1);
+    const visible = resolveVisibleAdminMenu(
+      "SYSTEM",
+      policy("SYSTEM", [], true),
+    );
+    const promotions = visible.find((group) => group.id === "promotions");
+    expect(promotions?.title).toBe("Quản lý khuyến mãi");
+    expect(promotions?.children).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "coupons",
+          title: "Mã khuyến mãi",
+          routeName: "super-admin-coupons",
+        }),
+        expect.objectContaining({
+          id: "flash-sales",
+          title: "Flash Sale",
+          routeName: "super-admin-flash-sales",
+        }),
+      ]),
+    );
+    expect(
+      visible
+        .find((group) => group.id === "sales")
+        ?.children?.some((child) => child.id === "flash-sales"),
+    ).not.toBe(true);
+    for (const type of ["SYSTEM", "BRANCH", "CUSTOMER"] as const) {
+      expect(
+        resolveVisibleAdminMenu(type, policy(type, [], false))
+          .flatMap((group) => group.children ?? [])
+          .some((child) => child.id === "flash-sales"),
+      ).toBe(false);
+    }
+  });
   it("matches the seeded BRANCH_ADMIN modules", () => {
     const ids = visibleIds("BRANCH", [
       ADMIN_PERMISSIONS.DASHBOARD_READ,

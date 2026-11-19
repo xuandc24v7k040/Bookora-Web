@@ -7,6 +7,7 @@ import {
   Gauge,
   Package,
   Ticket,
+  Zap,
   Users,
 } from "@lucide/vue";
 import type { AuthMeResponseDtoType } from "@/api/generated/models";
@@ -252,6 +253,13 @@ export const ADMIN_MENU: readonly AdminMenuItem[] = [
         superAdminOnly: true,
         label: "Mã khuyến mãi",
         routeNames: { SYSTEM: "super-admin-coupons" },
+      },
+      {
+        id: "flash-sales",
+        label: "Flash Sale",
+        icon: Zap,
+        superAdminOnly: true,
+        routeNames: { SYSTEM: "super-admin-flash-sales" },
       },
     ],
   },

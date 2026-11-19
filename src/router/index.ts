@@ -687,8 +687,23 @@ export const routes: RouteRecordRaw[] = [
       {
         path: "coupons",
         name: "super-admin-coupons",
-        component: () => import("@/features/coupons/pages/AdminCouponListPage.vue"),
-        beforeEnter: () => useAuthStore().user?.isSuperAdmin === true ? true : { name: "access-denied" },
+        component: () =>
+          import("@/features/coupons/pages/AdminCouponListPage.vue"),
+        beforeEnter: () =>
+          useAuthStore().user?.isSuperAdmin === true
+            ? true
+            : { name: "access-denied" },
+        meta: { requiresSelectedBranch: false },
+      },
+      {
+        path: "flash-sales",
+        name: "super-admin-flash-sales",
+        component: () =>
+          import("@/features/flash-sales/pages/AdminFlashSalePage.vue"),
+        beforeEnter: () =>
+          useAuthStore().user?.isSuperAdmin === true
+            ? true
+            : { name: "access-denied" },
         meta: { requiresSelectedBranch: false },
       },
     ],

@@ -1,0 +1,4 @@
+.flash-sale-surface {
+  --color-primary: oklch(0.38 0.095 148);
+  --color-primary-foreground: white;
+}
