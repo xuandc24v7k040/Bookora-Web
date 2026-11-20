@@ -18,6 +18,8 @@ import CustomerAvatarDialog from "@/features/customer-account/components/Custome
 import { useCustomerProfile } from "@/features/customer-account/composables/use-customer-account";
 import { useAuthStore } from "@/stores/auth.store";
 
+defineOptions({ inheritAttrs: false });
+
 const authStore = useAuthStore();
 const profileQuery = useCustomerProfile();
 const { isLoggingOut, logoutCustomer } = useCustomerLogout();
@@ -56,6 +58,7 @@ const items = [
 
 <template>
   <aside
+    v-bind="$attrs"
     class="min-w-0 rounded-xl border border-[var(--bookora-border)] bg-white p-3 text-[var(--bookora-ink)] shadow-sm"
   >
     <div class="px-2 pb-3 pt-2 text-center">

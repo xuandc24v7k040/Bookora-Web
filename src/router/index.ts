@@ -193,6 +193,7 @@ export async function resolveAuthNavigation(
   }
 
   if (
+    shouldBootstrap &&
     authStore.status === "unknown" &&
     authStore.bootstrapError &&
     !isGuestRoute
@@ -868,6 +869,8 @@ export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior: (to, from, savedPosition) => {
+    // Verification fragments are one-time credentials, never CSS selectors.
+    if (to.name === "customer-verify-email") return { top: 0 };
     if (savedPosition) return savedPosition;
     if (to.hash) return { el: to.hash };
     if (to.path === from.path) return false;

@@ -38,6 +38,7 @@ const rememberMe = ref(false);
 const showPassword = ref(false);
 const isSubmitting = ref(false);
 const globalError = ref<string | null>(null);
+const verificationRequired = ref(false);
 const turnstileToken = ref("");
 const turnstileError = ref<string | null>(null);
 const turnstileWidget = ref<InstanceType<typeof TurnstileWidget> | null>(null);
@@ -166,6 +167,7 @@ async function submitLogin(): Promise<void> {
     );
   } catch (error: unknown) {
     const mapped = getCustomerAuthErrorMessage(error, "login");
+    verificationRequired.value = Boolean(mapped.verificationRequired);
     if (mapped.placement === "turnstile") resetTurnstile(mapped.message);
     else {
       globalError.value = mapped.message;
@@ -228,6 +230,7 @@ async function submitLogin(): Promise<void> {
           </p>
         </div>
 
+        <RouterLink v-if="globalError && verificationRequired" to="/verify-email" class="mb-3 text-sm font-medium text-[var(--bookora-green)] hover:underline">Gửi lại email xác minh</RouterLink>
         <Field class="gap-1">
           <FieldLabel for="customer-login-email">Email</FieldLabel>
           <div class="relative">

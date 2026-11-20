@@ -93,6 +93,9 @@ describe('auth API adapter', () => {
       email: 'reader@bookora.vn',
       fullName: 'Nguyễn An',
       type: 'CUSTOMER' as const,
+      verificationRequired: true as const,
+      verificationDelivery: 'SENT' as const,
+      resendCooldownSeconds: 60,
     }
     generatedRegister.mockResolvedValue({
       statusCode: 201,

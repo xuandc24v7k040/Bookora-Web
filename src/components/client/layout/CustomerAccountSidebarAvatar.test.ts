@@ -22,7 +22,7 @@ const PreviewDialogStub = defineComponent({
   template: '<div data-testid="preview-dialog" :data-open="String(open)" />',
 });
 
-function mountSidebar(avatarUrl: string | null) {
+function mountSidebar(avatarUrl: string | null, attrs: Record<string, string> = {}) {
   activeQueryClient = new QueryClient({
     defaultOptions: { queries: { retry: false, staleTime: Infinity } },
   });
@@ -37,6 +37,7 @@ function mountSidebar(avatarUrl: string | null) {
     routes: [{ path: "/account/:pathMatch(.*)*", component: { template: "<div />" } }],
   });
   return mount(CustomerAccountSidebar, {
+    attrs,
     global: {
       plugins: [
         createPinia(),
@@ -52,6 +53,12 @@ function mountSidebar(avatarUrl: string | null) {
 }
 
 describe("CustomerAccountSidebar avatar workflow", () => {
+  it("forwards layout attributes only onto the aside despite sibling dialogs", () => {
+    const wrapper = mountSidebar('https://cdn.example/avatar.webp', { class: 'sticky top-4 hidden self-start md:block', 'data-layout-sidebar': 'true' });
+    expect(wrapper.get('aside').classes()).toEqual(expect.arrayContaining(['sticky', 'self-start', 'hidden', 'md:block']));
+    expect(wrapper.get('aside').attributes('data-layout-sidebar')).toBe('true');
+    expect(wrapper.get('[data-testid="avatar-dialog"]').classes()).not.toContain('self-start');
+  });
   it("shows initials and opens management from an avatar without an image", async () => {
     const wrapper = mountSidebar(null);
     expect(wrapper.text()).toContain("NA");

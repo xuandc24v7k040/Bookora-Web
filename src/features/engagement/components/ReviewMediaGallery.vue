@@ -25,7 +25,7 @@ watch(
       v-for="(image, position) in media.slice(0, 3)"
       :key="image.id"
       type="button"
-      class="relative aspect-square w-[calc((100%-1rem)/3)] max-w-20 overflow-hidden rounded-lg border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
+      class="relative aspect-square w-[calc((100%-1rem)/3)] max-w-20 cursor-pointer overflow-hidden rounded-lg border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
       :aria-label="`Xem ảnh đánh giá ${position + 1}${position === 2 ? ` và ${media.length - 3} ảnh tiếp theo` : ''}`"
       @click="
         index = position;

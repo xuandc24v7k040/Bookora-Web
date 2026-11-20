@@ -9,10 +9,18 @@ import {
 import { describe, expect, it, vi } from "vitest";
 import type { AuthMeResponseDto } from "@/api/generated/models";
 import {
+  router,
   resolveAdminPostAuthRoute,
   resolveAuthNavigation,
   safeRedirectForUser,
 } from "@/router";
+
+it("does not treat verification credentials as scroll selectors", async () => {
+  const to = router.resolve('/verify-email#token=synthetic-test-token');
+  const from = router.resolve('/login');
+  const result = await router.options.scrollBehavior?.(to as RouteLocationNormalized, from as RouteLocationNormalized, null);
+  expect(result).toEqual({ top: 0 });
+});
 
 const testRoutes: RouteRecordRaw[] = [
   {

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from "@lucide/vue";
 import { computed, reactive, ref, watch } from "vue";
-import { RouterLink, useRouter } from "vue-router";
+import { RouterLink } from "vue-router";
 import { toast } from "vue-sonner";
-import type { RegisterDto } from "@/api/generated/models";
+import type { RegisterDto, RegistrationResponseDto } from "@/api/generated/models";
 import { AuthRegisterBody } from "@/api/generated/zod/auth/auth";
 import { registerCustomer } from "@/api/modules/auth.api";
 import TurnstileWidget from "@/components/common/TurnstileWidget.vue";
@@ -18,11 +18,12 @@ import {
 import { env } from "@/lib/env";
 import AuthBrand from "./AuthBrand.vue";
 import GoogleAuthButton from "./GoogleAuthButton.vue";
+import EmailVerificationForm from "@/features/email-verification/components/EmailVerificationForm.vue";
 
 type RegisterField = "fullName" | "email" | "password" | "confirmPassword";
 
 const REGISTER_ERROR_TOAST_ID = "customer-register-auth-error";
-const router = useRouter();
+const registration = ref<RegistrationResponseDto | null>(null);
 const fullName = ref("");
 const email = ref("");
 const password = ref("");
@@ -131,12 +132,10 @@ async function submitRegistration(): Promise<void> {
 
   isSubmitting.value = true;
   try {
-    await registerCustomer(payload);
+    registration.value = await registerCustomer(payload);
+    password.value = "";
+    confirmPassword.value = "";
     turnstileWidget.value?.reset?.();
-    await router.replace({
-      name: "customer-login",
-      query: { registered: "1" },
-    });
   } catch (error: unknown) {
     const mapped = getCustomerAuthErrorMessage(error, "register");
     if (mapped.placement === "turnstile") resetTurnstile(mapped.message);
@@ -153,7 +152,9 @@ async function submitRegistration(): Promise<void> {
 </script>
 
 <template>
+  <EmailVerificationForm v-if="registration" :initial-email="registration.email" :delivery="registration.verificationDelivery" :cooldown-seconds="registration.resendCooldownSeconds" />
   <section
+    v-else
     class="auth-register-panel min-h-0 bg-white"
     aria-labelledby="customer-register-heading"
   >

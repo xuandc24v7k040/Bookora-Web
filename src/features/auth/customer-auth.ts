@@ -6,6 +6,7 @@ export type CustomerAuthErrorPlacement = 'global' | 'turnstile'
 export interface CustomerAuthErrorMessage {
   message: string
   placement: CustomerAuthErrorPlacement
+  verificationRequired?: boolean
 }
 
 const GOOGLE_ERROR_MESSAGES: Record<string, string> = {
@@ -32,6 +33,10 @@ export function getCustomerAuthErrorMessage(
   operation: 'login' | 'register',
 ): CustomerAuthErrorMessage {
   const apiError = toBookoraApiError(error)
+
+  if (apiError.code === 'EMAIL_VERIFICATION_REQUIRED') {
+    return { message: 'Vui lòng xác minh email trước khi đăng nhập. Kiểm tra hộp thư hoặc gửi lại email xác minh.', placement: 'global', verificationRequired: true }
+  }
 
   if (apiError.code === 'TURNSTILE_REQUIRED') {
     return { message: 'Yêu cầu xác minh bảo mật lại.', placement: 'turnstile' }

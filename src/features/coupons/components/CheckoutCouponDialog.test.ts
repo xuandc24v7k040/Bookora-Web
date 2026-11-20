@@ -111,6 +111,19 @@ async function open(): Promise<void> {
   await flushPromises();
 }
 describe("Checkout coupon draft and backend authority", () => {
+  it("keeps two card skeleton groups, code form and footer while loading, then shows vouchers", async () => {
+    let finish!: (value: CheckoutPreviewResponseDto) => void;
+    vi.mocked(previewCheckout).mockImplementation(() => new Promise((resolve) => { finish = resolve; }));
+    await open();
+    expect(wrapper.findAll('[data-coupon-skeleton]')).toHaveLength(2);
+    expect(wrapper.get('[aria-label="Mã voucher"]').attributes('disabled')).toBeDefined();
+    expect(wrapper.text()).toContain('Xác nhận voucher');
+    expect(wrapper.text()).not.toContain('Chưa có voucher');
+    finish(response());
+    await flushPromises();
+    expect(wrapper.findAll('[data-coupon-skeleton]')).toHaveLength(0);
+    expect(wrapper.find('#voucher-BOOKORA10').exists()).toBe(true);
+  });
   it("shows the approved two groups without a duplicate pricing breakdown and disables unavailable vouchers", async () => {
     await open();
     expect(wrapper.text()).toContain("Voucher giảm giá đơn hàng");

@@ -123,6 +123,9 @@ beforeEach(() => {
     email: "reader@bookora.vn",
     fullName: "Nguyễn An",
     type: "CUSTOMER",
+    verificationRequired: true,
+    verificationDelivery: "SENT",
+    resendCooldownSeconds: 60,
   });
 });
 
@@ -374,14 +377,6 @@ describe("CustomerRegisterForm", () => {
     await wrapper.get("form").trigger("submit");
     expect(wrapper.text()).toContain("Vui lòng hoàn tất xác minh bảo mật.");
 
-    turnstile.vm.$emit("verified", "customer-token");
-    await wrapper.vm.$nextTick();
-    await wrapper.get("form").trigger("submit");
-    await flushPromises();
-    expect(registerMock).toHaveBeenCalledWith(
-      expect.objectContaining({ turnstileToken: "customer-token" }),
-    );
-
     turnstile.vm.$emit("expired");
     await wrapper.vm.$nextTick();
     await wrapper.get("form").trigger("submit");
@@ -392,5 +387,16 @@ describe("CustomerRegisterForm", () => {
     await wrapper.vm.$nextTick();
     await wrapper.get("form").trigger("submit");
     expect(wrapper.text()).toContain("Vui lòng hoàn tất xác minh bảo mật.");
+
+    turnstile.vm.$emit("verified", "customer-token");
+    await wrapper.vm.$nextTick();
+    await wrapper.get("form").trigger("submit");
+    await flushPromises();
+    expect(registerMock).toHaveBeenCalledWith(
+      expect.objectContaining({ turnstileToken: "customer-token" }),
+    );
+    expect(wrapper.text()).toContain("Kiểm tra hộp thư của bạn");
+    expect(wrapper.get('button[type="submit"]').attributes("disabled")).toBeDefined();
+    expect(loginMock).not.toHaveBeenCalled();
   });
 });

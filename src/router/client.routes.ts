@@ -105,6 +105,12 @@ export const clientRoutes: RouteRecordRaw[] = [
         component: () => import("@/pages/app/auth/ForgotPasswordPage.vue"),
       },
       {
+        path: "verify-email",
+        name: "customer-verify-email",
+        component: () => import("@/pages/app/auth/EmailVerificationPage.vue"),
+        meta: { skipAuthBootstrap: true },
+      },
+      {
         path: "reset-password",
         name: "customer-reset-password",
         component: () => import("@/pages/app/auth/ResetPasswordPage.vue"),

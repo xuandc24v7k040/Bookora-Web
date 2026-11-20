@@ -37,14 +37,18 @@ import type {
   AuthMe200,
   AuthRefresh200,
   AuthRegister201,
+  AuthResendEmailVerification200,
   AuthResetPassword200,
   AuthValidateResetPasswordToken200,
+  AuthVerifyEmail200,
   ErrorResponseDto,
   ForgotPasswordDto,
   LoginDto,
   RegisterDto,
+  ResendVerificationDto,
   ResetPasswordDto,
-  ValidateResetTokenDto
+  ValidateResetTokenDto,
+  VerifyEmailDto
 } from '../../models';
 
 import { customInstance } from '../../../mutator';
@@ -56,7 +60,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
- * Tạo tài khoản mới, chưa đăng nhập tự động.
+ * Tạo tài khoản LOCAL CUSTOMER cần xác minh email, không tạo phiên đăng nhập. Trạng thái gửi thư được trả riêng để có thể gửi lại khi lỗi.
  * @summary Đăng ký tài khoản
  */
 export const authRegister = (
@@ -184,7 +188,7 @@ export const useAuthLogin = <TError = ErrorType<ErrorResponseDto>,
       return useMutation(getAuthLoginMutationOptions(options), queryClient);
     }
     /**
- * Thu hồi tất cả phiên đang hoạt động của user xác định từ cookie accessToken hoặc refreshToken, sau đó xóa cookie đăng nhập. Backend sử dụng accessToken hoặc refreshToken nếu cookie tồn tại để xác định user và revoke active sessions; chúng không phải security precondition bắt buộc.
+ * Chỉ thu hồi phiên hiện tại xác định từ cookie accessToken hoặc refreshToken, sau đó xóa cookie đăng nhập; giữ các thiết bị khác. Backend sử dụng accessToken hoặc refreshToken nếu cookie tồn tại để xác định user và revoke active sessions; chúng không phải security precondition bắt buộc.
  * @summary Đăng xuất
  */
 export const authLogout = (
@@ -783,4 +787,132 @@ export const useAuthResetPassword = <TError = ErrorType<ErrorResponseDto>,
         TContext
       > => {
       return useMutation(getAuthResetPasswordMutationOptions(options), queryClient);
+    }
+    /**
+ * Xác minh email đăng ký bằng liên kết một lần
+ * @summary Xác minh email đăng ký bằng liên kết một lần
+ */
+export const authVerifyEmail = (
+    verifyEmailDto: MaybeRef<VerifyEmailDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      verifyEmailDto = unref(verifyEmailDto);
+
+      return customInstance<AuthVerifyEmail200>(
+      {url: `/auth/email-verification/verify`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: verifyEmailDto, signal
+    },
+      options);
+    }
+
+
+
+export const getAuthVerifyEmailMutationOptions = <TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authVerifyEmail>>, TError,{data: BodyType<VerifyEmailDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof authVerifyEmail>>, TError,{data: BodyType<VerifyEmailDto>}, TContext> => {
+
+const mutationKey = ['authVerifyEmail'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authVerifyEmail>>, {data: BodyType<VerifyEmailDto>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  authVerifyEmail(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AuthVerifyEmailMutationResult = NonNullable<Awaited<ReturnType<typeof authVerifyEmail>>>
+    export type AuthVerifyEmailMutationBody = BodyType<VerifyEmailDto>
+    export type AuthVerifyEmailMutationError = ErrorType<ErrorResponseDto>
+
+    /**
+ * @summary Xác minh email đăng ký bằng liên kết một lần
+ */
+export const useAuthVerifyEmail = <TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authVerifyEmail>>, TError,{data: BodyType<VerifyEmailDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof authVerifyEmail>>,
+        TError,
+        {data: BodyType<VerifyEmailDto>},
+        TContext
+      > => {
+      return useMutation(getAuthVerifyEmailMutationOptions(options), queryClient);
+    }
+    /**
+ * Phản hồi trung tính, không tiết lộ tài khoản tồn tại hay trạng thái gửi thư.
+ * @summary Yêu cầu gửi lại email xác minh
+ */
+export const authResendEmailVerification = (
+    resendVerificationDto: MaybeRef<ResendVerificationDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      resendVerificationDto = unref(resendVerificationDto);
+
+      return customInstance<AuthResendEmailVerification200>(
+      {url: `/auth/email-verification/resend`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: resendVerificationDto, signal
+    },
+      options);
+    }
+
+
+
+export const getAuthResendEmailVerificationMutationOptions = <TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authResendEmailVerification>>, TError,{data: BodyType<ResendVerificationDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof authResendEmailVerification>>, TError,{data: BodyType<ResendVerificationDto>}, TContext> => {
+
+const mutationKey = ['authResendEmailVerification'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authResendEmailVerification>>, {data: BodyType<ResendVerificationDto>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  authResendEmailVerification(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AuthResendEmailVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof authResendEmailVerification>>>
+    export type AuthResendEmailVerificationMutationBody = BodyType<ResendVerificationDto>
+    export type AuthResendEmailVerificationMutationError = ErrorType<ErrorResponseDto>
+
+    /**
+ * @summary Yêu cầu gửi lại email xác minh
+ */
+export const useAuthResendEmailVerification = <TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authResendEmailVerification>>, TError,{data: BodyType<ResendVerificationDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof authResendEmailVerification>>,
+        TError,
+        {data: BodyType<ResendVerificationDto>},
+        TContext
+      > => {
+      return useMutation(getAuthResendEmailVerificationMutationOptions(options), queryClient);
     }

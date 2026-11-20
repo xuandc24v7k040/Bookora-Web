@@ -10,9 +10,11 @@ import type {
   LoginDto,
   PublicAuthUserResponseDto,
   RegisterDto,
+  RegistrationResponseDto,
 } from '@/api/generated/models'
 import type { AxiosRequestConfig } from 'axios'
 import { getCsrfToken } from '@/api/http/csrf-manager'
+import { withAuthCsrfRecovery } from '@/api/http/auth-csrf-request'
 
 export type FetchCurrentUserOptions = Pick<
   AxiosRequestConfig,
@@ -23,15 +25,15 @@ export async function loginWithPassword(
   payload: LoginDto,
 ): Promise<PublicAuthUserResponseDto> {
   await getCsrfToken()
-  const response = await authLogin(payload)
+  const response = await withAuthCsrfRecovery(() => authLogin(payload))
   return response.data
 }
 
 export async function registerCustomer(
   payload: RegisterDto,
-): Promise<PublicAuthUserResponseDto> {
+): Promise<RegistrationResponseDto> {
   await getCsrfToken()
-  const response = await authRegister(payload)
+  const response = await withAuthCsrfRecovery(() => authRegister(payload))
   return response.data
 }
 

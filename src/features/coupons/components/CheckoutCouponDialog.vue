@@ -18,6 +18,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { previewCheckout } from "@/features/checkout/api/checkout-api";
@@ -196,15 +197,27 @@ onBeforeUnmount(() => {
           <div
             v-if="pending && !coupons.length"
             role="status"
-            class="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground"
+            class="sr-only"
           >
-            <LoaderCircle class="size-4 animate-spin" />Đang tải voucher...
+            Đang tải voucher...
           </div>
           <section v-for="group in groups" :key="group.type" class="space-y-3">
             <h3 :id="`coupon-group-${group.type}`" class="font-semibold">
               {{ group.title }}
             </h3>
+            <div v-if="pending && !coupons.length" class="space-y-3" aria-hidden="true" data-coupon-skeleton>
+              <div v-for="placeholder in 2" :key="placeholder" class="flex min-w-0 items-center gap-3 rounded-xl border p-3 sm:p-4">
+                <div class="hidden w-16 shrink-0 flex-col items-center gap-2 border-r pr-3 min-[360px]:flex">
+                  <Skeleton class="size-6" /><Skeleton class="h-3 w-12" />
+                </div>
+                <div class="min-w-0 flex-1 space-y-2">
+                  <Skeleton class="h-5 w-4/5" /><Skeleton class="h-4 w-3/5" /><Skeleton class="h-7 w-24 rounded-full" />
+                </div>
+                <Skeleton class="size-4 shrink-0 rounded-full" />
+              </div>
+            </div>
             <RadioGroup
+              v-else
               :aria-labelledby="`coupon-group-${group.type}`"
               :model-value="group.type === 'ORDER' ? orderCode : shippingCode"
               :disabled="pending"

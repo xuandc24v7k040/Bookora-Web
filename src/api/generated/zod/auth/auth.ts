@@ -9,7 +9,7 @@ import * as zod from 'zod';
 
 
 /**
- * Tạo tài khoản mới, chưa đăng nhập tự động.
+ * Tạo tài khoản LOCAL CUSTOMER cần xác minh email, không tạo phiên đăng nhập. Trạng thái gửi thư được trả riêng để có thể gửi lại khi lỗi.
  * @summary Đăng ký tài khoản
  */
 export const authRegisterBodyFullNameMin = 2;
@@ -98,5 +98,32 @@ export const authResetPasswordBodyNewPasswordMax = 128;
 export const AuthResetPasswordBody = zod.strictObject({
   "token": zod.string().min(authResetPasswordBodyTokenMin).max(authResetPasswordBodyTokenMax).regex(authResetPasswordBodyTokenRegExp),
   "newPassword": zod.stringFormat('password', authResetPasswordBodyNewPasswordRegExp).min(authResetPasswordBodyNewPasswordMin).max(authResetPasswordBodyNewPasswordMax)
+})
+
+/**
+ * Xác minh email đăng ký bằng liên kết một lần
+ * @summary Xác minh email đăng ký bằng liên kết một lần
+ */
+export const authVerifyEmailBodyTokenMin = 43;
+export const authVerifyEmailBodyTokenMax = 43;
+
+
+export const authVerifyEmailBodyTokenRegExp = new RegExp('^[A-Za-z0-9_-]{43}$');
+
+
+export const AuthVerifyEmailBody = zod.strictObject({
+  "token": zod.string().min(authVerifyEmailBodyTokenMin).max(authVerifyEmailBodyTokenMax).regex(authVerifyEmailBodyTokenRegExp)
+})
+
+/**
+ * Phản hồi trung tính, không tiết lộ tài khoản tồn tại hay trạng thái gửi thư.
+ * @summary Yêu cầu gửi lại email xác minh
+ */
+export const authResendEmailVerificationBodyEmailMax = 254;
+
+
+
+export const AuthResendEmailVerificationBody = zod.strictObject({
+  "email": zod.email().max(authResendEmailVerificationBodyEmailMax)
 })
 
