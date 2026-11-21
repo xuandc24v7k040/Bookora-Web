@@ -1,6 +1,7 @@
 import type { Component } from "vue";
 import {
   Boxes,
+  Bell,
   BarChart3,
   Building2,
   ClipboardList,
@@ -25,6 +26,7 @@ interface AdminMenuRoute {
 }
 
 export interface AdminMenuItem {
+  requiredAnyPermissions?: readonly AdminPermission[];
   superAdminOnly?: boolean;
   id: string;
   label: string;
@@ -62,6 +64,10 @@ export const ADMIN_MENU: readonly AdminMenuItem[] = [
     },
     requiredPermissions: [ADMIN_PERMISSIONS.DASHBOARD_READ],
   },
+  { id: 'notifications', label: 'Thông báo', icon: Bell,
+    routeNames: { BRANCH: 'branch-admin-notifications' }, requiresSelectedBranch: true,
+    requiredPermissions: [ADMIN_PERMISSIONS.ORDERS_READ],
+    requiredAnyPermissions: [ADMIN_PERMISSIONS.ORDERS_UPDATE_STATUS, ADMIN_PERMISSIONS.ORDERS_CANCEL] },
   {
     id: "reports",
     label: "Báo cáo",
@@ -266,6 +272,7 @@ export const ADMIN_MENU: readonly AdminMenuItem[] = [
 ] as const;
 
 function isAllowed(item: AdminMenuItem, policy: PermissionPolicy): boolean {
+  if (item.requiredAnyPermissions && !policy.canAny(item.requiredAnyPermissions)) return false;
   if (item.superAdminOnly && !policy.isSuperAdmin) return false;
   const required = item.requiredPermissions ?? [];
   if (required.length === 0) return true;

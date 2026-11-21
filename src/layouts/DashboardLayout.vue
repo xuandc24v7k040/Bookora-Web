@@ -2,6 +2,7 @@
 import { Building2, Check, Search } from "@lucide/vue";
 import { RouterView } from "vue-router";
 import AppSidebar from "@/components/admin/sidebar/AppSidebar.vue";
+import NotificationBell from '@/features/notifications/components/NotificationBell.vue';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -77,6 +78,7 @@ async function setSelectedBranch(branchId: string | null): Promise<void> {
             </div>
           </div>
 
+          <NotificationBell operations />
           <div class="flex min-w-0 flex-1 shrink-0 justify-end lg:flex-none">
             <DropdownMenu
               v-if="branchStore.isInitialized && (authStore.user?.type === 'SYSTEM' || branchStore.availableBranches.length > 1)"

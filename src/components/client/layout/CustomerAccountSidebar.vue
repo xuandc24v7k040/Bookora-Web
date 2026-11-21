@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { RouterLink } from "vue-router";
 import {
+  Bell,
   ClipboardList,
   Eye,
   Heart,
@@ -49,6 +50,7 @@ const initials = computed(
 const items = [
   { label: "Tổng quan", to: "/account", icon: Home },
   { label: "Đơn hàng của tôi", to: "/account/orders", icon: ClipboardList },
+  { label: "Thông báo của tôi", to: "/account/notifications", icon: Bell },
   { label: "Địa chỉ của tôi", to: "/account/addresses", icon: MapPin },
   { label: "Sách yêu thích", to: "/account/wishlist", icon: Heart },
   { label: "Đánh giá của tôi", to: "/account/reviews", icon: Star },

@@ -292,6 +292,9 @@ export async function resolveAuthNavigation(
     }
 
     const requiredPermissions = to.meta.requiredPermissions ?? [];
+    if (to.meta.requiredAnyPermissions && !policy.canAny(to.meta.requiredAnyPermissions)) {
+      return { name: 'access-denied', query: { from: to.fullPath } };
+    }
     if (requiredPermissions.length > 0) {
       const isAllowed =
         to.meta.permissionMode === "any"
@@ -725,6 +728,10 @@ export const routes: RouteRecordRaw[] = [
         component: () => import("@/pages/branch-admin/DashboardPage.vue"),
         meta: { requiredPermissions: [ADMIN_PERMISSIONS.DASHBOARD_READ] },
       },
+      { path: 'notifications', name: 'branch-admin-notifications',
+        component: () => import('@/features/notifications/pages/AdminNotificationsPage.vue'),
+        meta: { requiredPermissions: [ADMIN_PERMISSIONS.ORDERS_READ],
+          requiredAnyPermissions: [ADMIN_PERMISSIONS.ORDERS_UPDATE_STATUS, ADMIN_PERMISSIONS.ORDERS_CANCEL] } },
       {
         path: "reports/revenue",
         name: "branch-admin-revenue-report",

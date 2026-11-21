@@ -150,6 +150,8 @@ async function submitDialog(): Promise<void> {
   if (!order.value || !dialogMode.value || !dialogValid.value || saving.value)
     return;
   saving.value = true;
+  const mutationBranchId = branchId.value;
+  const mutationOrderId = orderId.value;
   try {
     const completedMode = dialogMode.value;
     const completedTarget = targetStatus.value;
@@ -169,15 +171,15 @@ async function submitDialog(): Promise<void> {
               note: dialogText.value.trim(),
             });
     queryClient.setQueryData(
-      adminOrderKeys.detail(branchId.value, orderId.value),
+      adminOrderKeys.detail(mutationBranchId, mutationOrderId),
       updated,
     );
     await Promise.all([
       queryClient.invalidateQueries({
-        queryKey: adminOrderKeys.detail(branchId.value, orderId.value),
+        queryKey: adminOrderKeys.detail(mutationBranchId, mutationOrderId),
       }),
       queryClient.invalidateQueries({
-        queryKey: adminOrderKeys.lists(branchId.value),
+        queryKey: adminOrderKeys.lists(mutationBranchId),
       }),
     ]);
     if (completedMode === "transition" || completedMode === "cancel") {

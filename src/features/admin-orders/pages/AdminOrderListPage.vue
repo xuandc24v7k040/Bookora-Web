@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { keepPreviousData, useQuery } from "@tanstack/vue-query";
+import { useQuery } from "@tanstack/vue-query";
 import { RefreshCcw } from "@lucide/vue";
 import { useRoute, useRouter } from "vue-router";
 import type {
@@ -65,7 +65,8 @@ const ordersQuery = useQuery({
   queryKey: computed(() => adminOrderKeys.list(branchId.value, params.value)),
   queryFn: ({ signal }) => listAdminOrders(params.value, signal),
   enabled: computed(() => Boolean(branchId.value)),
-  placeholderData: keepPreviousData,
+  placeholderData: (previous, previousQuery) =>
+    previousQuery?.queryKey[1] === branchId.value ? previous : undefined,
 });
 
 const filters: DataTableFilterableColumn[] = [

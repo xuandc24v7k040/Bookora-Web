@@ -1,0 +1,16 @@
+.notification-client {
+  --notification-accent: var(--bookora-green, #14532d);
+  --notification-soft: #f0f8ee;
+}
+.notification-admin {
+  --notification-accent: var(--color-primary);
+  --notification-soft: var(--color-muted);
+}
+.notification-theme .notification-unread { background: var(--notification-soft); }
+.notification-theme .notification-action { color: var(--notification-accent); }
+.notification-theme .notification-dot { background: var(--notification-accent); }
+.notification-theme .notification-icon,
+.notification-theme .notification-category,
+.notification-theme .notification-footer { color: var(--notification-accent); background: var(--notification-soft); }
+.notification-theme .notification-active { background: var(--notification-accent); color: white; }
+.notification-admin button:not(:disabled) { cursor: pointer; }

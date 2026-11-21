@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import reviewDialogSource from "@/features/engagement/components/ReviewFormDialog.vue?raw";
 import mainSource from "@/main.ts?raw";
+import orderSyncSource from "./state/order-realtime.ts?raw";
 import accountOrdersSource from "@/pages/app/account/AccountOrdersPage.vue?raw";
 import {
   ORDER_DETAIL_QUERY_POLICY,
@@ -9,10 +10,11 @@ import {
 
 describe("Phase 17 order list refresh and review textarea hotfix", () => {
   it("invalidates every customer list plus the affected detail on an order signal", () => {
-    expect(mainSource).toContain(
+    expect(mainSource).toContain("installOrderRealtime(pinia, realtimeSession.connection)");
+    expect(orderSyncSource).toContain(
       "queryClient.invalidateQueries({ queryKey: customerOrderKeys.all })",
     );
-    expect(mainSource).toContain("customerOrderKeys.detail(orderId)");
+    expect(orderSyncSource).toContain("customerOrderKeys.detail(id)");
   });
 
   it("always refreshes order lists on mount, focus and reconnect without polling", () => {

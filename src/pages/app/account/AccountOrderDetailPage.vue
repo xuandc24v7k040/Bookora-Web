@@ -119,12 +119,12 @@ const money = new Intl.NumberFormat("vi-VN");
         ><ArrowLeft class="size-4" /> Trở lại</RouterLink
       >
     </Button>
-    <div v-if="orderQuery.data.value" class="space-y-5">
+    <div v-if="orderQuery.data.value && !orderQuery.isError.value" class="space-y-5">
       <section class="rounded-xl border bg-white p-5">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p class="text-sm text-slate-500">Mã đơn hàng</p>
-            <h1 class="mt-1 text-2xl font-bold">
+            <h1 class="mt-1 break-all text-2xl font-bold">
               {{ orderQuery.data.value.orderCode }}
             </h1>
           </div>
@@ -318,8 +318,16 @@ const money = new Intl.NumberFormat("vi-VN");
         <Ban class="size-4" /> Hủy đơn hàng
       </Button>
     </div>
+    <p v-else-if="orderQuery.isFetching.value" class="py-8 text-sm text-muted-foreground" role="status">
+      Đang tải thông tin đơn hàng...
+    </p>
+    <div v-else class="rounded-xl border p-5" role="alert">
+      <p class="text-sm text-muted-foreground">Không thể tải thông tin đơn hàng. Vui lòng thử lại.</p>
+      <Button class="mt-3 cursor-pointer" variant="outline" @click="orderQuery.refetch()">Thử lại</Button>
+    </div>
     <AlertDialog
-      :open="cancelDialogOpen"
+      v-if="orderQuery.data.value && !orderQuery.isError.value"
+      :open="cancelDialogOpen && cancellable"
       @update:open="handleCancelDialogOpenChange"
     >
       <AlertDialogContent

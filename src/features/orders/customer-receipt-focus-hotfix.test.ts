@@ -3,6 +3,7 @@ import adminDetail from "@/features/admin-orders/pages/AdminOrderDetailPage.vue?
 import receiptAction from "@/features/orders/components/CustomerReceiptConfirmationAction.vue?raw";
 import customerDetail from "@/pages/app/account/AccountOrderDetailPage.vue?raw";
 import mainSource from "@/main.ts?raw";
+import orderSyncSource from "./state/order-realtime.ts?raw";
 import {
   ORDER_DETAIL_QUERY_POLICY,
   ORDER_LIST_QUERY_POLICY,
@@ -50,9 +51,10 @@ describe("customer receipt and focus refetch hotfix", () => {
   });
 
   it("invalidates both customer and selected-branch admin order caches cross-tab", () => {
-    expect(mainSource).toContain("customerOrderKeys.all");
-    expect(mainSource).toContain("customerOrderKeys.detail(orderId)");
-    expect(mainSource).toContain("adminOrderKeys.lists");
-    expect(mainSource).toContain("adminOrderKeys.detail");
+    expect(mainSource).toContain("installOrderRealtime(pinia, realtimeSession.connection)");
+    expect(orderSyncSource).toContain("customerOrderKeys.all");
+    expect(orderSyncSource).toContain("customerOrderKeys.detail(id)");
+    expect(orderSyncSource).toContain("adminOrderKeys.lists");
+    expect(orderSyncSource).toContain("adminOrderKeys.detail");
   });
 });

@@ -7,6 +7,7 @@ import type { LocationQueryRaw } from "vue-router";
 import { toast } from "vue-sonner";
 import type { PublicProductListItemDto } from "@/api/generated/models";
 import BranchSelector from "@/components/client/layout/BranchSelector.vue";
+import NotificationBell from '@/features/notifications/components/NotificationBell.vue';
 import ClientBrand from "@/components/client/layout/ClientBrand.vue";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -369,6 +370,7 @@ async function openCart(): Promise<void> {
               >
             </span>
           </button>
+          <NotificationBell />
           <button
             type="button"
             class="relative flex min-h-11 cursor-pointer items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
@@ -381,7 +383,7 @@ async function openCart(): Promise<void> {
             />
             <span
               v-if="cartQuantity > 0"
-              class="absolute -top-1 left-4 grid min-w-5 place-items-center rounded-full bg-red-600 px-1 text-[11px] font-bold leading-5 text-white"
+              class="absolute -top-1 left-4 grid min-w-5 place-items-center rounded-full bg-[var(--bookora-green)] px-1 text-[11px] font-bold leading-5 text-white"
               aria-label="Số lượng sản phẩm trong giỏ"
               >{{ cartQuantity > 99 ? "99+" : cartQuantity }}</span
             >
@@ -392,7 +394,7 @@ async function openCart(): Promise<void> {
 
       <div class="grid gap-3 py-3 lg:hidden">
         <div
-          class="grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-2"
+          class="flex items-center gap-1 [&>a]:mr-auto"
         >
           <MobileCategorySheet
             :categories="categoriesQuery.data.value ?? []"
@@ -414,6 +416,7 @@ async function openCart(): Promise<void> {
           >
             <Heart aria-hidden="true" class="size-5.5" />
           </button>
+          <NotificationBell />
           <button
             type="button"
             aria-label="Giỏ hàng"
@@ -423,7 +426,7 @@ async function openCart(): Promise<void> {
             <ShoppingCart aria-hidden="true" class="size-6" />
             <span
               v-if="cartQuantity > 0"
-              class="absolute right-0 top-0 grid min-w-5 place-items-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-5 text-white"
+              class="absolute right-0 top-0 grid min-w-5 place-items-center rounded-full bg-[var(--bookora-green)] px-1 text-[10px] font-bold leading-5 text-white"
               >{{ cartQuantity > 99 ? "99+" : cartQuantity }}</span
             >
           </button>

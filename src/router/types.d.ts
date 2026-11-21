@@ -9,6 +9,7 @@ declare module 'vue-router' {
     allowedUserTypes?: AuthMeResponseDtoType[]
     skipAuthBootstrap?: boolean
     requiredPermissions?: readonly AdminPermission[]
+    requiredAnyPermissions?: readonly AdminPermission[]
     requiresSelectedBranch?: boolean
     permissionMode?: 'all' | 'any'
     resolvesAdminHome?: boolean
