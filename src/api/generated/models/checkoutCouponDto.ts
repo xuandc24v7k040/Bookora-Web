@@ -6,9 +6,12 @@
  * OpenAPI spec version: 1.0
  */
 import type { CheckoutCouponDtoDiscountType } from './checkoutCouponDtoDiscountType';
+import type { CheckoutCouponDtoMinimumMembershipTier } from './checkoutCouponDtoMinimumMembershipTier';
 import type { CheckoutCouponDtoType } from './checkoutCouponDtoType';
 
 export interface CheckoutCouponDto {
+  /** @nullable */
+  minimumMembershipTier: CheckoutCouponDtoMinimumMembershipTier;
   code: string;
   name: string;
   /** @nullable */

@@ -47,7 +47,7 @@ async function setSelectedBranch(branchId: string | null): Promise<void> {
           class="flex h-full min-w-0 items-center gap-2 px-3 sm:gap-3 sm:px-6"
         >
           <div class="flex min-w-0 shrink-0 items-center gap-3">
-            <SidebarTrigger />
+            <SidebarTrigger class="cursor-pointer" />
             <Separator orientation="vertical" class="hidden h-6 sm:block" />
 
             <div class="hidden min-w-0 max-w-56 xl:block">
@@ -87,7 +87,7 @@ async function setSelectedBranch(branchId: string | null): Promise<void> {
                 <Button
                   type="button"
                   variant="outline"
-                  class="h-10 min-w-0 max-w-52 justify-start gap-2 rounded-xl bg-background"
+                  class="h-10 min-w-0 max-w-52 cursor-pointer justify-start gap-2 rounded-xl bg-background"
                 >
                   <Building2 class="h-4 w-4 text-muted-foreground" />
                   <span class="hidden text-xs text-muted-foreground md:inline"
@@ -103,7 +103,7 @@ async function setSelectedBranch(branchId: string | null): Promise<void> {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   v-if="authStore.user?.type === 'SYSTEM'"
-                  class="gap-2"
+                  class="cursor-pointer gap-2"
                   @click="setSelectedBranch(null)"
                 >
                   <Building2 class="h-4 w-4 text-muted-foreground" />
@@ -116,7 +116,7 @@ async function setSelectedBranch(branchId: string | null): Promise<void> {
                 <DropdownMenuItem
                   v-for="branch in branchStore.availableBranches"
                   :key="branch.id"
-                  class="gap-2"
+                  class="cursor-pointer gap-2"
                   @click="setSelectedBranch(branch.id)"
                 >
                   <Building2 class="h-4 w-4 text-muted-foreground" />

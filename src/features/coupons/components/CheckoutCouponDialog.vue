@@ -24,6 +24,7 @@ import { Label } from "@/components/ui/label";
 import { previewCheckout } from "@/features/checkout/api/checkout-api";
 import { formatVnd } from "@/features/products/utils/product-money";
 import { couponBenefit, couponErrorMessage } from "../coupon-utils";
+import MembershipTierBadge from '@/features/membership/components/MembershipTierBadge.vue';
 
 const props = defineProps<{
   open: boolean;
@@ -256,6 +257,7 @@ onBeforeUnmount(() => {
                     :class="coupon.selectable ? 'cursor-pointer' : 'cursor-not-allowed'"
                   >
                     <strong class="block text-sm leading-5">{{ couponBenefit(coupon) }}</strong>
+                    <MembershipTierBadge v-if="coupon.minimumMembershipTier" :tier="coupon.minimumMembershipTier" minimum />
                     <span class="block text-xs text-muted-foreground">Đơn từ {{ formatVnd(coupon.minOrderAmount) }}</span>
                     <span v-if="!coupon.selectable" class="block text-xs text-destructive">{{ coupon.reasonMessage }}</span>
                   </Label>

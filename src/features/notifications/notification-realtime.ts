@@ -4,17 +4,22 @@ import { useBranchStore } from '@/stores/branch.store';
 import { queryClient } from '@/lib/query-client';
 import type { RealtimeConnection } from '@/lib/realtime/connection';
 
-interface NotificationChanged { version: 1; id?: string; branchId: string | null }
+interface NotificationChanged { version: 1; id?: string; branchId: string | null; type?: string }
 declare module '@/lib/realtime/connection' {
   interface RealtimeEvents { 'notification.changed': NotificationChanged }
 }
 
 export function installNotificationRealtime(pinia: Pinia, manager: RealtimeConnection): () => void {
   const auth = useAuthStore(pinia), branches = useBranchStore(pinia);
-  const invalidate = () => { void queryClient.invalidateQueries({ queryKey: ['notifications'] }); };
+  const invalidate = (membership = true) => {
+    void queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    if (membership) void queryClient.invalidateQueries({ queryKey: ['membership'] });
+  };
   const reset = () => {
     void queryClient.cancelQueries({ queryKey: ['notifications'] });
     queryClient.removeQueries({ queryKey: ['notifications'] });
+    void queryClient.cancelQueries({ queryKey: ['membership'] });
+    queryClient.removeQueries({ queryKey: ['membership'] });
   };
   reset();
   const stopReset = manager.onReset(reset);
@@ -22,7 +27,9 @@ export function installNotificationRealtime(pinia: Pinia, manager: RealtimeConne
   const stopEvents = manager.on('notification.changed', (event) => {
     if (event?.version !== 1) return;
     if (auth.user?.type === 'CUSTOMER' ? event.branchId !== null : event.branchId !== branches.selectedBranchId) return;
-    invalidate(); // No counters derived from possibly duplicated/out-of-order socket messages.
+    invalidate(event.type === 'MEMBERSHIP_UPGRADED' || event.type === 'ORDER_COMPLETED'); // No counters derived from possibly duplicated/out-of-order socket messages.
+    if (event.type === 'COUPON_ACTIVE' && auth.user?.type === 'CUSTOMER')
+      void queryClient.invalidateQueries({ queryKey: ['membership', auth.user.id, 'coupons'] });
   });
   const focus = () => { if (auth.isAuthenticated) invalidate(); };
   window.addEventListener('focus', focus);

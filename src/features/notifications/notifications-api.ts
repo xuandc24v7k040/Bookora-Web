@@ -40,6 +40,7 @@ export function notificationTarget(item: NotificationItemDto, operations: boolea
   if (item.referenceType === 'ORDER' && /^[0-7][0-9A-HJKMNP-TV-Z]{25}$/.test(item.referenceId))
     return operations ? `/branch-admin/orders/${item.referenceId}` : `/account/orders/${item.referenceId}`;
   if (operations) return null;
+  if (item.referenceType === 'MEMBERSHIP') return '/account/membership';
   if (item.referenceType === 'FLASH_SALE') return '/flash-sale';
   if (item.referenceType === 'COUPON') return '/san-pham?onSale=true';
   return null;

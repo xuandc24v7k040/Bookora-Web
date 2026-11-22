@@ -18,7 +18,6 @@ import {
 } from "@/authorization/permission-policy";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import DashboardLayout from "@/layouts/DashboardLayout.vue";
-import LoginPage from "@/pages/auth/LoginPage.vue";
 import AccessDeniedPage from "@/pages/errors/AccessDeniedPage.vue";
 import AuthUnavailablePage from "@/pages/errors/AuthUnavailablePage.vue";
 import NotFoundPage from "@/pages/errors/NotFoundPage.vue";
@@ -346,7 +345,7 @@ export const routes: RouteRecordRaw[] = [
       {
         path: "login",
         name: "admin-login",
-        component: LoginPage,
+        component: () => import("@/pages/auth/LoginPage.vue"),
         meta: { guestOnly: true, skipAuthBootstrap: true },
       },
     ],
@@ -697,6 +696,13 @@ export const routes: RouteRecordRaw[] = [
           useAuthStore().user?.isSuperAdmin === true
             ? true
             : { name: "access-denied" },
+        meta: { requiresSelectedBranch: false },
+      },
+      {
+        path: "membership",
+        name: "super-admin-membership",
+        component: () => import("@/features/membership/pages/AdminMembershipPage.vue"),
+        beforeEnter: () => useAuthStore().user?.isSuperAdmin === true ? true : { name: "access-denied" },
         meta: { requiresSelectedBranch: false },
       },
       {

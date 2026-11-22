@@ -17,6 +17,7 @@ vi.mock("vue-sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 const cards: CheckoutCouponDto[] = [
   {
     code: "BOOKORA10",
+    minimumMembershipTier: null,
     name: "Giảm sách",
     description: null,
     type: "ORDER",
@@ -31,6 +32,7 @@ const cards: CheckoutCouponDto[] = [
   },
   {
     code: "SHIP20",
+    minimumMembershipTier: null,
     name: "Giảm phí",
     description: null,
     type: "SHIPPING",
@@ -45,6 +47,7 @@ const cards: CheckoutCouponDto[] = [
   },
   {
     code: "SHIP50",
+    minimumMembershipTier: null,
     name: "Giảm phí",
     description: null,
     type: "SHIPPING",

@@ -4,6 +4,7 @@ import { RouterLink } from "vue-router";
 import {
   Bell,
   ClipboardList,
+  Crown,
   Eye,
   Heart,
   Home,
@@ -54,6 +55,7 @@ const items = [
   { label: "Địa chỉ của tôi", to: "/account/addresses", icon: MapPin },
   { label: "Sách yêu thích", to: "/account/wishlist", icon: Heart },
   { label: "Đánh giá của tôi", to: "/account/reviews", icon: Star },
+  { label: "Hạng thành viên", to: "/account/membership", icon: Crown },
   { label: "Thông tin tài khoản", to: "/account/profile", icon: UserRound },
 ];
 </script>
@@ -118,7 +120,7 @@ const items = [
               ? 'page'
               : undefined
           "
-          class="flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm transition-colors hover:bg-[var(--bookora-soft)]"
+          class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 text-sm transition-colors hover:bg-[var(--bookora-soft)]"
           :class="
             (item.to === '/account' ? isExactActive : isActive)
               ? 'bg-[var(--bookora-soft)] font-semibold text-[var(--bookora-green)]'

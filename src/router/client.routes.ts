@@ -163,6 +163,11 @@ export const clientRoutes: RouteRecordRaw[] = [
         component: () => import("@/pages/app/account/AccountProfilePage.vue"),
       },
       {
+        path: "membership",
+        name: "customer-account-membership",
+        component: () => import("@/features/membership/pages/CustomerMembershipPage.vue"),
+      },
+      {
         path: "rewards",
         redirect: { name: "customer-account-profile" },
       },

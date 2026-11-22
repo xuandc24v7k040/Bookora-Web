@@ -5,6 +5,7 @@ import {
   BarChart3,
   Building2,
   ClipboardList,
+  Crown,
   Gauge,
   Package,
   Ticket,
@@ -268,6 +269,10 @@ export const ADMIN_MENU: readonly AdminMenuItem[] = [
         routeNames: { SYSTEM: "super-admin-flash-sales" },
       },
     ],
+  },
+  {
+    id: 'customers', label: 'Quản lý khách hàng', icon: Crown,
+    children: [{ id: 'membership', label: 'Quản lý thành viên', superAdminOnly: true, routeNames: { SYSTEM: 'super-admin-membership' } }],
   },
 ] as const;
 

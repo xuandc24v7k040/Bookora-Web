@@ -86,7 +86,7 @@ vi.mock("@tanstack/vue-query", async (importOriginal) => {
         }
       },
     }),
-    useQuery: () => ({ data: ref(shippingOrder) }),
+    useQuery: () => ({ data: ref(shippingOrder), isError: ref(false) }),
     useQueryClient: () => ({
       invalidateQueries: invalidateQueriesMock,
       setQueryData: setQueryDataMock,

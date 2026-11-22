@@ -5,6 +5,7 @@ import type { CouponResponseDto } from "@/api/generated/models";
 import CouponFormDialog from "./CouponFormDialog.vue";
 
 const coupon: CouponResponseDto = {
+  minimumMembershipTier: null,
   id: "01M7KYTQTWDAC7GNMQFVXKR5QD",
   code: "BOOKORA10",
   name: "Ưu đãi sách",

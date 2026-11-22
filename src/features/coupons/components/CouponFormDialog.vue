@@ -26,6 +26,7 @@ import VndMoneyInput from "@/features/products/components/VndMoneyInput.vue";
 import { couponFormSchema } from "../coupon-form";
 import { couponMinute, couponTimeError, type CouponTimeField } from "../coupon-period";
 import CouponDateTimePicker from "./CouponDateTimePicker.vue";
+import { tierLabels, type MembershipTier } from '@/features/membership/membership-ui';
 
 const props = defineProps<{
   open: boolean;
@@ -44,6 +45,7 @@ const form = reactive({
   description: "",
   type: "ORDER" as SaveCouponDto["type"],
   visibility: "PUBLIC" as SaveCouponDto["visibility"],
+  minimumMembershipTier: 'NONE' as MembershipTier | 'NONE',
   discountType: "FIXED_AMOUNT" as SaveCouponDto["discountType"],
   discountValue: "",
   minOrderAmount: "",
@@ -65,6 +67,7 @@ const timeFields = [
 const candidate = computed(() => ({
   ...form,
   code: form.code.trim().toUpperCase(),
+  minimumMembershipTier: form.minimumMembershipTier === 'NONE' ? null : form.minimumMembershipTier,
   discountValue: form.discountValue === "" ? NaN : Number(form.discountValue),
   minOrderAmount:
     form.minOrderAmount === "" ? null : Number(form.minOrderAmount),
@@ -107,6 +110,7 @@ watch(
       description: row?.description ?? "",
       type: row?.type ?? "ORDER",
       visibility: row?.visibility ?? "PUBLIC",
+      minimumMembershipTier: row?.minimumMembershipTier ?? 'NONE',
       discountType: row?.discountType ?? "FIXED_AMOUNT",
       discountValue: row ? String(row.discountValue) : "",
       minOrderAmount:
@@ -239,6 +243,15 @@ function save(): void {
                     ></SelectContent
                   ></Select
                 >
+              </div>
+              <div class="sm:col-span-2">
+                <Label for="coupon-membership">Hạng thành viên tối thiểu</Label>
+                <Select v-model="form.minimumMembershipTier" :disabled="pending">
+                  <SelectTrigger id="coupon-membership" class="mt-2 w-full cursor-pointer"><SelectValue /></SelectTrigger>
+                  <SelectContent><SelectItem value="NONE" class="cursor-pointer">Không giới hạn</SelectItem><SelectItem v-for="(label, tier) in tierLabels" :key="tier" :value="tier" class="cursor-pointer">{{ label }}</SelectItem></SelectContent>
+                </Select>
+                <p class="mt-2 text-xs text-muted-foreground">{{ form.minimumMembershipTier === 'NONE' ? 'Mọi khách hàng có thể dùng khi thỏa điều kiện chiến dịch.' : `Chỉ thành viên hạng ${tierLabels[form.minimumMembershipTier]} trở lên được dùng mã này.` }}</p>
+                <p v-if="errors.minimumMembershipTier" class="mt-1 text-xs text-destructive">{{ errors.minimumMembershipTier }}</p>
               </div>
               <div class="sm:col-span-2">
                 <Label for="coupon-description">Mô tả (không bắt buộc)</Label>

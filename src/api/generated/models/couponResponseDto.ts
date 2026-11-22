@@ -6,11 +6,14 @@
  * OpenAPI spec version: 1.0
  */
 import type { CouponResponseDtoDiscountType } from './couponResponseDtoDiscountType';
+import type { CouponResponseDtoMinimumMembershipTier } from './couponResponseDtoMinimumMembershipTier';
 import type { CouponResponseDtoStatus } from './couponResponseDtoStatus';
 import type { CouponResponseDtoType } from './couponResponseDtoType';
 import type { CouponResponseDtoVisibility } from './couponResponseDtoVisibility';
 
 export interface CouponResponseDto {
+  /** @nullable */
+  minimumMembershipTier: CouponResponseDtoMinimumMembershipTier;
   /**
      * @minLength 26
      * @maxLength 26

@@ -57,7 +57,7 @@ async function select(item: NotificationItemDto) {
     <div class="my-5 flex flex-wrap items-center gap-3">
       <Tabs v-model="tab" class="w-full min-w-0 max-w-full sm:w-auto"><TabsList class="h-auto w-full flex-wrap gap-1 rounded-none">
         <TabsTrigger v-for="option in [{ value: 'all', label: 'Tất cả' }, { value: 'unread', label: 'Chưa đọc' }, { value: 'order', label: 'Đơn hàng' }, { value: 'promotion', label: 'Khuyến mãi' }]"
-          :key="option.value" :value="option.value" class="shrink-0 flex-none cursor-pointer rounded-none" :class="tab === option.value ? 'notification-active' : ''">{{ option.label }}</TabsTrigger>
+          :key="option.value" :value="option.value" class="shrink-0 flex-none cursor-pointer rounded-none data-[state=active]:rounded-[4px]" :class="tab === option.value ? 'notification-active' : ''">{{ option.label }}</TabsTrigger>
       </TabsList></Tabs>
       <div class="relative min-w-0 flex-1 basis-60"><Search class="pointer-events-none absolute left-3 top-3 size-4 text-muted-foreground" /><Input v-model="search" aria-label="Tìm thông báo" placeholder="Tìm theo tiêu đề hoặc nội dung thông báo" class="h-10 pl-9" /></div>
       <Button variant="outline" class="notification-action h-10 max-w-full cursor-pointer whitespace-normal" :disabled="!state.unread.value || state.mark.isPending.value" @click="markAll"><Check class="size-4" /> Đánh dấu tất cả đã đọc</Button>

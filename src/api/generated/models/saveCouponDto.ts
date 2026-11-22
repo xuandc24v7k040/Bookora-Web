@@ -6,10 +6,13 @@
  * OpenAPI spec version: 1.0
  */
 import type { SaveCouponDtoDiscountType } from './saveCouponDtoDiscountType';
+import type { SaveCouponDtoMinimumMembershipTier } from './saveCouponDtoMinimumMembershipTier';
 import type { SaveCouponDtoType } from './saveCouponDtoType';
 import type { SaveCouponDtoVisibility } from './saveCouponDtoVisibility';
 
 export interface SaveCouponDto {
+  /** @nullable */
+  minimumMembershipTier?: SaveCouponDtoMinimumMembershipTier;
   /**
      * @minLength 3
      * @maxLength 40

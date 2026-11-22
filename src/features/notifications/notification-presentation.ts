@@ -1,6 +1,7 @@
-import { CheckCircle2, ClipboardCheck, CreditCard, Package, Tag, Truck, XCircle, Zap } from '@lucide/vue';
+import { CheckCircle2, ClipboardCheck, CreditCard, Crown, Package, Tag, Truck, XCircle, Zap } from '@lucide/vue';
 
 export function notificationIcon(type: string) {
+  if (type === 'MEMBERSHIP_UPGRADED') return Crown;
   if (type === 'COUPON_ACTIVE') return Tag;
   if (type === 'FLASH_SALE_ACTIVE') return Zap;
   if (type.includes('PAYMENT')) return CreditCard;

@@ -1,0 +1,23 @@
+.membership-client {
+  --primary: var(--bookora-green);
+  --ring: var(--bookora-green);
+  --color-primary: var(--bookora-green);
+  --color-ring: var(--bookora-green);
+}
+.membership-hero {
+  background: linear-gradient(
+    120deg,
+    var(--bookora-cream),
+    var(--bookora-soft)
+  );
+}
+.membership-client button:not(:disabled),
+.membership-admin button:not(:disabled),
+.membership-client [role='combobox']:not(:disabled),
+.membership-admin [role='combobox']:not(:disabled) {
+  cursor: pointer;
+}
+.membership-client button:disabled,
+.membership-admin button:disabled {
+  cursor: not-allowed;
+}

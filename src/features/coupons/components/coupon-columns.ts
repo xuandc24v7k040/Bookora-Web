@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatVnd } from "@/features/products/utils/product-money";
 import { formatDateTime } from "@/lib/date-format";
 import { couponBenefit } from "../coupon-utils";
+import MembershipTierBadge from '@/features/membership/components/MembershipTierBadge.vue';
 
 export const couponStatusLabels: Record<CouponResponseDto["status"], string> = {
   ACTIVE: "Đang hoạt động",
@@ -56,6 +57,7 @@ export const couponColumns: ColumnDef<CouponResponseDto>[] = [
         },
         [
           h("p", { class: "font-medium" }, row.original.name),
+          row.original.minimumMembershipTier ? h(MembershipTierBadge, { tier: row.original.minimumMembershipTier, minimum: true }) : null,
           h(
             "p",
             { class: "text-xs leading-5 text-muted-foreground" },

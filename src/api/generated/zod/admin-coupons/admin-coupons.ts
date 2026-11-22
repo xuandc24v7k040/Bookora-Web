@@ -62,6 +62,7 @@ export const adminCouponsCreateBodyUsageLimitPerUserMax = 2147483647;
 
 
 export const AdminCouponsCreateBody = zod.strictObject({
+  "minimumMembershipTier": zod.enum(['BRONZE', 'SILVER', 'GOLD', 'DIAMOND']).nullish(),
   "code": zod.string().min(adminCouponsCreateBodyCodeMin).max(adminCouponsCreateBodyCodeMax).regex(adminCouponsCreateBodyCodeRegExp),
   "name": zod.string().max(adminCouponsCreateBodyNameMax),
   "description": zod.string().max(adminCouponsCreateBodyDescriptionMax).optional(),
@@ -119,6 +120,7 @@ export const adminCouponsUpdateBodyUsageLimitPerUserMax = 2147483647;
 
 
 export const AdminCouponsUpdateBody = zod.strictObject({
+  "minimumMembershipTier": zod.enum(['BRONZE', 'SILVER', 'GOLD', 'DIAMOND']).nullish(),
   "code": zod.string().min(adminCouponsUpdateBodyCodeMin).max(adminCouponsUpdateBodyCodeMax).regex(adminCouponsUpdateBodyCodeRegExp),
   "name": zod.string().max(adminCouponsUpdateBodyNameMax),
   "description": zod.string().max(adminCouponsUpdateBodyDescriptionMax).optional(),

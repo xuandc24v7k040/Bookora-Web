@@ -10,6 +10,7 @@ vi.mock("../use-admin-coupons", () => ({ useAdminCoupons: vi.fn() }));
 vi.mock("vue-sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 const coupon: CouponResponseDto = {
+  minimumMembershipTier: null,
   id: "01M7KYTQTWDAC7GNMQFVXKR5QD",
   code: "BOOKORA10",
   name: "Ưu đãi sách",

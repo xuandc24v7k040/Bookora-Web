@@ -45,6 +45,7 @@ vi.mock("@tanstack/vue-query", async (importOriginal) => {
       };
     },
     useQuery: () => ({
+      isError: ref(false),
       data: ref({
         id: "order-1",
         orderCode: "BK0001",
