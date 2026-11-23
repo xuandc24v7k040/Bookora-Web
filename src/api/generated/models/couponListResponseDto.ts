@@ -8,6 +8,9 @@
 import type { CouponResponseDto } from './couponResponseDto';
 
 export interface CouponListResponseDto {
+  serverNow: string;
+  /** @nullable */
+  nextTransitionAt: string | null;
   items: CouponResponseDto[];
   page: number;
   limit: number;

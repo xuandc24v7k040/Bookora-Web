@@ -1,4 +1,5 @@
 import { computed, type Ref } from "vue";
+import { useTimeBoundaryRefetch } from "@/composables/use-time-boundary-refetch";
 import {
   keepPreviousData,
   useQuery,
@@ -26,11 +27,23 @@ import type {
 
 export function useAdminFlashSales(params: Ref<AdminFlashSalesListParams>) {
   const cache = useQueryClient();
+  let requestStartedAt = 0;
   const query = useQuery({
     queryKey: computed(() => ["admin-flash-sales", params.value]),
-    queryFn: async ({ signal }) =>
-      (await adminFlashSalesList(params.value, undefined, signal)).data,
+    queryFn: async ({ signal }) => {
+      requestStartedAt = performance.now();
+      return (await adminFlashSalesList(params.value, undefined, signal)).data;
+    },
     placeholderData: keepPreviousData,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: "always",
+    refetchOnReconnect: "always",
+  });
+  useTimeBoundaryRefetch({
+    metadata: () => query.isPlaceholderData.value ? undefined : query.data.value,
+    fetching: query.isFetching,
+    requestStartedAt: () => requestStartedAt,
+    refetch: () => query.refetch({ cancelRefetch: false }),
   });
   async function invalidate() {
     await Promise.all([

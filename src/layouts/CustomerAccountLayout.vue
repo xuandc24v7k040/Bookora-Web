@@ -3,6 +3,7 @@ import { RouterView } from 'vue-router'
 import ClientFooter from '@/components/client/layout/ClientFooter.vue'
 import ClientHeader from '@/components/client/layout/ClientHeader.vue'
 import CustomerAccountSidebar from '@/components/client/layout/CustomerAccountSidebar.vue'
+import MembershipCelebrationHost from '@/features/membership/components/MembershipCelebrationHost.vue'
 import { Menu } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
@@ -23,6 +24,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
       </div>
     </main>
     <ClientFooter />
+    <MembershipCelebrationHost />
   </div>
 </template>
 

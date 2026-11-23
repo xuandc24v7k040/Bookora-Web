@@ -8,6 +8,9 @@
 import type { FlashSaleResponseDto } from './flashSaleResponseDto';
 
 export interface FlashSaleListResponseDto {
+  serverNow: string;
+  /** @nullable */
+  nextTransitionAt: string | null;
   items: FlashSaleResponseDto[];
   page: number;
   limit: number;

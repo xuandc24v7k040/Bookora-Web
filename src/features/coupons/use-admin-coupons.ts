@@ -1,4 +1,5 @@
 import { computed, type Ref } from "vue";
+import { useTimeBoundaryRefetch } from "@/composables/use-time-boundary-refetch";
 import {
   keepPreviousData,
   useMutation,
@@ -19,11 +20,23 @@ import type {
 
 export function useAdminCoupons(params: Ref<AdminCouponsListParams>) {
   const client = useQueryClient();
+  let requestStartedAt = 0;
   const query = useQuery({
     queryKey: computed(() => ["admin-coupons", params.value]),
-    queryFn: async ({ signal }) =>
-      (await adminCouponsList(params.value, undefined, signal)).data,
+    queryFn: async ({ signal }) => {
+      requestStartedAt = performance.now();
+      return (await adminCouponsList(params.value, undefined, signal)).data;
+    },
     placeholderData: keepPreviousData,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: "always",
+    refetchOnReconnect: "always",
+  });
+  useTimeBoundaryRefetch({
+    metadata: () => query.isPlaceholderData.value ? undefined : query.data.value,
+    fetching: query.isFetching,
+    requestStartedAt: () => requestStartedAt,
+    refetch: () => query.refetch({ cancelRefetch: false }),
   });
   const save = useMutation({
     mutationFn: ({ id, data }: { id?: string; data: SaveCouponDto }) =>

@@ -22,7 +22,7 @@ import '../membership.css'
 
 const membership = useMembership(),
   coupons = useMembershipCoupons(1, 3),
-  transactions = useMembershipTransactions(1, 3)
+  transactions = useMembershipTransactions(1, 4)
 const summary = computed(() => membership.data.value)
 const dialog = ref<'coupons' | 'transactions' | null>(null)
 const sections = [

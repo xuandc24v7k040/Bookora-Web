@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import ClientFooter from '@/components/client/layout/ClientFooter.vue'
 import ClientHeader from '@/components/client/layout/ClientHeader.vue'
+import MembershipCelebrationHost from '@/features/membership/components/MembershipCelebrationHost.vue'
 import { hasSessionHint } from '@/features/auth/session-hint'
 import { useAuthStore } from '@/stores/auth.store'
 
@@ -20,6 +21,7 @@ onMounted(() => {
       <RouterView />
     </main>
     <ClientFooter />
+    <MembershipCelebrationHost />
   </div>
 </template>
 
