@@ -11,6 +11,7 @@ export const permissionResourceLabels: Readonly<Record<string, string>> = {
   branch_admin: "quản trị chi nhánh",
   branch_returns: "yêu cầu hoàn trả",
   orders: "đơn hàng",
+  support: "hỗ trợ khách hàng",
   payments: "thanh toán",
   reports: "báo cáo",
   "reports.revenue": "báo cáo doanh thu",
@@ -29,6 +30,9 @@ export const permissionResourceLabels: Readonly<Record<string, string>> = {
 };
 
 const ACTION_LABELS: Readonly<Record<string, string>> = {
+  claim: "Tiếp nhận",
+  reply: "Trả lời",
+  manage: "Quản lý",
   read: "Xem",
   create: "Tạo",
   update: "Cập nhật",

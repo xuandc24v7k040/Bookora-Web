@@ -2,6 +2,8 @@ import { createApp } from "vue";
 import { installNotificationRealtime } from '@/features/notifications/notification-realtime';
 import { installRealtimeSession } from '@/lib/realtime/session';
 import { installOrderRealtime } from '@/features/orders/state/order-realtime';
+import { useSupportStore } from '@/features/support/state/support.store';
+import '@/features/support/support.css';
 import "./style.css";
 import '@/features/notifications/notifications.css';
 import App from "./App.vue";
@@ -30,6 +32,7 @@ installEngagementSync(queryClient);
 const stopInventorySync = setupInventorySync();
 const stopCartSync = setupCartSync(() => useCartActions().refresh());
 const stopOrderSync = installOrderRealtime(pinia, realtimeSession.connection);
+const stopSupportSync = useSupportStore(pinia).attach(realtimeSession.connection);
 
 useThemeStore(pinia).initTheme();
 
@@ -42,5 +45,6 @@ if (import.meta.hot) {
     realtimeSession.dispose();
     stopCartSync();
     stopOrderSync();
+    stopSupportSync();
   });
 }

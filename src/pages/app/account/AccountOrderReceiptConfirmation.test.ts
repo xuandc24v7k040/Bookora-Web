@@ -123,7 +123,7 @@ describe("customer receipt confirmation", () => {
   it("opens an explicit confirmation dialog without mutating immediately", async () => {
     const wrapper = mount(AccountOrderDetailPage, {
       attachTo: document.body,
-      global: { stubs: { RouterLink: true } },
+      global: { stubs: { RouterLink: true, SupportOrderContact: true } },
     });
 
     const action = wrapper
@@ -140,7 +140,7 @@ describe("customer receipt confirmation", () => {
   it("confirms once, invalidates detail/list, publishes sync, and keeps SHIPPING", async () => {
     const wrapper = mount(AccountOrderDetailPage, {
       attachTo: document.body,
-      global: { stubs: { RouterLink: true } },
+      global: { stubs: { RouterLink: true, SupportOrderContact: true } },
     });
     const action = wrapper
       .findAll("button")
@@ -177,7 +177,7 @@ describe("customer receipt confirmation", () => {
     receiptApiMock.mockRejectedValueOnce(new Error("failed"));
     const wrapper = mount(AccountOrderDetailPage, {
       attachTo: document.body,
-      global: { stubs: { RouterLink: true } },
+      global: { stubs: { RouterLink: true, SupportOrderContact: true } },
     });
     const action = wrapper
       .findAll("button")

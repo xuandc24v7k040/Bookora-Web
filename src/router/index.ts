@@ -729,6 +729,11 @@ export const routes: RouteRecordRaw[] = [
     redirect: { name: "admin-home" },
     children: [
       {
+        path: 'support', name: 'branch-admin-support',
+        component: () => import('@/features/support/pages/SupportInboxPage.vue'),
+        meta: { requiredPermissions: [ADMIN_PERMISSIONS.SUPPORT_READ] },
+      },
+      {
         path: "dashboard",
         name: "branch-admin-dashboard",
         component: () => import("@/pages/branch-admin/DashboardPage.vue"),

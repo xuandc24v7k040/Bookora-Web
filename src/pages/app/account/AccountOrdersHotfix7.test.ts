@@ -105,6 +105,7 @@ function mountPage() {
   return mount(AccountOrdersPage, {
     global: {
       stubs: {
+        SupportOrderContact: true,
         Badge: { template: "<span><slot /></span>" },
         Button: { template: "<button><slot /></button>" },
         CustomerReceiptConfirmationAction: {

@@ -7,6 +7,7 @@ import {
   ClipboardList,
   Crown,
   Gauge,
+  MessageSquare,
   Package,
   Ticket,
   Zap,
@@ -249,6 +250,10 @@ export const ADMIN_MENU: readonly AdminMenuItem[] = [
         requiredPermissions: [ADMIN_PERMISSIONS.REVIEWS_READ],
       },
     ],
+  },
+  {
+    id: 'customer-support', label: 'Chăm sóc khách hàng', icon: MessageSquare,
+    children: [{ id: 'support-inbox', label: 'Tin nhắn khách hàng', routeNames: { BRANCH: 'branch-admin-support' }, requiredPermissions: [ADMIN_PERMISSIONS.SUPPORT_READ], requiresSelectedBranch: true }],
   },
   {
     id: "promotions",

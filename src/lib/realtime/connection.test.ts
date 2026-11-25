@@ -35,7 +35,7 @@ describe('shared realtime connection lifecycle', () => {
     const manager = new RealtimeConnection('https://api.example.test', '/socket.io', async () => true, reconcile);
     manager.connect(); manager.connect();
     expect(mock.io).toHaveBeenCalledTimes(1);
-    expect(mock.io).toHaveBeenCalledWith('https://api.example.test/realtime', expect.objectContaining({ withCredentials: true, reconnectionAttempts: 5 }));
+    expect(mock.io).toHaveBeenCalledWith('https://api.example.test/realtime', expect.objectContaining({ withCredentials: true, reconnectionAttempts: Infinity }));
     mock.handlers.get('connect')?.();
     expect(manager.status.value).toBe('connected'); expect(reconcile).toHaveBeenCalledOnce();
     manager.disconnect(); expect(mock.disconnect).toHaveBeenCalledOnce(); expect(manager.status.value).toBe('offline');

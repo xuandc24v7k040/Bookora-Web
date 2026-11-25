@@ -24,6 +24,7 @@ import {
 } from "@/features/orders/api/customer-orders-api";
 import { ORDER_LIST_QUERY_POLICY } from "@/features/orders/api/order-query-policy";
 import CustomerReceiptConfirmationAction from "@/features/orders/components/CustomerReceiptConfirmationAction.vue";
+import SupportOrderContact from '@/features/support/components/SupportOrderContact.vue';
 import {
   customerOrderStatusLabel,
   paymentStatusLabel,
@@ -242,10 +243,10 @@ async function changePage(page: number, replace = false): Promise<void> {
           class="rounded-xl border bg-white p-5"
         >
           <div class="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p class="flex items-center gap-2 font-bold">
-                <ShoppingBag class="size-4 text-green-700" />
-                {{ order.orderCode }}
+            <div class="min-w-0 max-w-full">
+              <p class="flex min-w-0 items-start gap-2 font-bold">
+                <ShoppingBag class="mt-1 size-4 shrink-0 text-green-700" />
+                <span class="min-w-0 [overflow-wrap:anywhere]">{{ order.orderCode }}</span>
               </p>
               <p class="mt-1 text-sm text-slate-500">
                 Ngày đặt hàng: {{ date.format(new Date(order.placedAt)) }}
@@ -302,6 +303,7 @@ async function changePage(page: number, replace = false): Promise<void> {
                   :order-id="order.id"
                   compact
                 />
+                <SupportOrderContact :order-id="order.id" class="w-full shrink-0 sm:w-auto" />
                 <Button
                   v-if="
                     order.status === 'COMPLETED' &&

@@ -104,7 +104,7 @@ describe("customer order cancellation confirmation", () => {
   it("does not mutate when opening or dismissing the dialog", async () => {
     const wrapper = mount(AccountOrderDetailPage, {
       attachTo: document.body,
-      global: { stubs: { RouterLink: true } },
+      global: { stubs: { RouterLink: true, SupportOrderContact: true } },
     });
 
     await wrapper.get("button.bg-destructive").trigger("click");
@@ -131,7 +131,7 @@ describe("customer order cancellation confirmation", () => {
   it("mutates exactly once after explicit confirmation", async () => {
     const wrapper = mount(AccountOrderDetailPage, {
       attachTo: document.body,
-      global: { stubs: { RouterLink: true } },
+      global: { stubs: { RouterLink: true, SupportOrderContact: true } },
     });
 
     await wrapper.get("button.bg-destructive").trigger("click");
@@ -161,7 +161,7 @@ describe("customer order cancellation confirmation", () => {
     );
     const wrapper = mount(AccountOrderDetailPage, {
       attachTo: document.body,
-      global: { stubs: { RouterLink: true } },
+      global: { stubs: { RouterLink: true, SupportOrderContact: true } },
     });
 
     await wrapper.get("button.bg-destructive").trigger("click");
@@ -184,7 +184,7 @@ describe("customer order cancellation confirmation", () => {
     cancelApiMock.mockRejectedValueOnce(new Error("cancel failed"));
     const wrapper = mount(AccountOrderDetailPage, {
       attachTo: document.body,
-      global: { stubs: { RouterLink: true } },
+      global: { stubs: { RouterLink: true, SupportOrderContact: true } },
     });
 
     await wrapper.get("button.bg-destructive").trigger("click");
@@ -205,7 +205,7 @@ describe("customer order cancellation confirmation", () => {
   it("closes after success and runs the existing invalidation", async () => {
     const wrapper = mount(AccountOrderDetailPage, {
       attachTo: document.body,
-      global: { stubs: { RouterLink: true } },
+      global: { stubs: { RouterLink: true, SupportOrderContact: true } },
     });
 
     await wrapper.get("button.bg-destructive").trigger("click");

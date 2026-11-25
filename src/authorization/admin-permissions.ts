@@ -67,6 +67,10 @@ export const ADMIN_PERMISSIONS = {
   REVIEWS_READ: "reviews.read",
   REVIEWS_MODERATE: "reviews.moderate",
   PAYMENTS_CREATE: "payments.create",
+  SUPPORT_READ: "support.read",
+  SUPPORT_CLAIM: "support.claim",
+  SUPPORT_REPLY: "support.reply",
+  SUPPORT_MANAGE: "support.manage",
 } as const;
 
 export type AdminPermission =

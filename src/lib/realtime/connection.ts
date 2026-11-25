@@ -2,6 +2,7 @@ import { io, type Socket } from 'socket.io-client';
 import { shallowRef } from 'vue';
 
 export interface RealtimeEvents {} // Domain contracts augment this interface.
+export interface RealtimeClientEvents {} // Whitelisted client-to-server domain signals.
 export type RealtimeStatus = 'offline' | 'connecting' | 'connected';
 
 /** One manager per application/tab, shared by every domain and mounted view. */
@@ -46,12 +47,18 @@ export class RealtimeConnection {
     return () => { handlers.delete(wrapped); };
   }
 
+  emit<K extends keyof RealtimeClientEvents & string>(name: K, payload: RealtimeClientEvents[K]): boolean {
+    if (!this.socket?.connected) return false;
+    this.socket.volatile.emit(name, payload);
+    return true;
+  }
+
   connect(): void {
     if (this.socket) { if (!this.socket.connected) this.socket.connect(); return; }
     const generation = ++this.generation;
     this.status.value = 'connecting';
     const socket = io(`${this.url}/realtime`, { path: this.path, withCredentials: true,
-      reconnectionAttempts: 5, reconnectionDelay: 1000, reconnectionDelayMax: 30000,
+      reconnectionAttempts: Infinity, reconnectionDelay: 1000, reconnectionDelayMax: 30000,
       randomizationFactor: 0.5, autoConnect: false });
     this.socket = socket;
     socket.on('connect', () => { this.status.value = 'connected'; this.reconcileDomains(); });

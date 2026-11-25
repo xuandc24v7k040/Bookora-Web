@@ -22,6 +22,7 @@ import {
   getCustomerOrder,
 } from "@/features/orders/api/customer-orders-api";
 import CustomerReceiptConfirmationAction from "@/features/orders/components/CustomerReceiptConfirmationAction.vue";
+import SupportOrderContact from '@/features/support/components/SupportOrderContact.vue';
 import { ORDER_DETAIL_QUERY_POLICY } from "@/features/orders/api/order-query-policy";
 import {
   customerOrderStatusLabel,
@@ -306,6 +307,7 @@ const money = new Intl.NumberFormat("vi-VN");
         v-if="orderQuery.data.value.allowedActions.confirmReceived"
         :order-id="orderQuery.data.value.id"
       />
+      <SupportOrderContact :order-id="orderQuery.data.value.id" />
       <ReviewFormDialog
         v-model:open="reviewDialogOpen"
         :opportunity="selectedOpportunity"
