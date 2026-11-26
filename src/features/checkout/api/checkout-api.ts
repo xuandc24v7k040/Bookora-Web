@@ -6,12 +6,14 @@ import type {
   PlaceOrderResponseDto,
   PreviewCheckoutDto,
   VnpayPlaceOrderResponseDto,
+  GhnShippingOptionDto,
 } from "@/api/generated/models";
 import {
   checkoutPlaceOrderCod,
   checkoutPlaceOrderVnpay,
   checkoutPreview,
   checkoutReverseCurrentLocation,
+  checkoutGhnShippingQuote,
 } from "@/api/generated/endpoints/checkout/checkout";
 import {
   paymentsRetry,
@@ -23,6 +25,15 @@ export async function previewCheckout(
   signal?: AbortSignal,
 ): Promise<CheckoutPreviewResponseDto> {
   return (await checkoutPreview(payload, { branchScoped: true }, signal)).data;
+}
+
+export async function getGhnShippingQuote(
+  payload: PreviewCheckoutDto,
+  signal?: AbortSignal,
+): Promise<GhnShippingOptionDto> {
+  return (
+    await checkoutGhnShippingQuote(payload, { branchScoped: true }, signal)
+  ).data;
 }
 
 export async function reverseCheckoutLocation(

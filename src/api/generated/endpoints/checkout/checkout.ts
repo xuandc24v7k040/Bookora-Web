@@ -29,6 +29,7 @@ import type {
 } from 'vue';
 
 import type {
+  CheckoutGhnShippingQuote201,
   CheckoutPlaceOrderCod201,
   CheckoutPlaceOrderVnpay201,
   CheckoutPreview201,
@@ -50,6 +51,70 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
+ * Báo giá GHN độc lập, không tạo vận đơn
+ * @summary Báo giá GHN độc lập, không tạo vận đơn
+ */
+export const checkoutGhnShippingQuote = (
+    previewCheckoutDto: MaybeRef<PreviewCheckoutDto>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      previewCheckoutDto = unref(previewCheckoutDto);
+
+      return customInstance<CheckoutGhnShippingQuote201>(
+      {url: `/checkout/shipping/ghn-quote`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: previewCheckoutDto, signal
+    },
+      options);
+    }
+
+
+
+export const getCheckoutGhnShippingQuoteMutationOptions = <TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkoutGhnShippingQuote>>, TError,{data: BodyType<PreviewCheckoutDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof checkoutGhnShippingQuote>>, TError,{data: BodyType<PreviewCheckoutDto>}, TContext> => {
+
+const mutationKey = ['checkoutGhnShippingQuote'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof checkoutGhnShippingQuote>>, {data: BodyType<PreviewCheckoutDto>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  checkoutGhnShippingQuote(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CheckoutGhnShippingQuoteMutationResult = NonNullable<Awaited<ReturnType<typeof checkoutGhnShippingQuote>>>
+    export type CheckoutGhnShippingQuoteMutationBody = BodyType<PreviewCheckoutDto>
+    export type CheckoutGhnShippingQuoteMutationError = ErrorType<ErrorResponseDto>
+
+    /**
+ * @summary Báo giá GHN độc lập, không tạo vận đơn
+ */
+export const useCheckoutGhnShippingQuote = <TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkoutGhnShippingQuote>>, TError,{data: BodyType<PreviewCheckoutDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationReturnType<
+        Awaited<ReturnType<typeof checkoutGhnShippingQuote>>,
+        TError,
+        {data: BodyType<PreviewCheckoutDto>},
+        TContext
+      > => {
+      return useMutation(getCheckoutGhnShippingQuoteMutationOptions(options), queryClient);
+    }
+    /**
  * Revalidate CartItem và tính checkout preview stateless
  * @summary Revalidate CartItem và tính checkout preview stateless
  */

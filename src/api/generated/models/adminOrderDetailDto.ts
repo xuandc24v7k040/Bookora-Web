@@ -8,6 +8,7 @@
 import type { AdminOrderAllowedActionsDto } from './adminOrderAllowedActionsDto';
 import type { AdminOrderCompletionReadinessDto } from './adminOrderCompletionReadinessDto';
 import type { AdminOrderCustomerReceiptConfirmationDto } from './adminOrderCustomerReceiptConfirmationDto';
+import type { AdminOrderDetailDtoShippingProvider } from './adminOrderDetailDtoShippingProvider';
 import type { AdminOrderDetailDtoStatus } from './adminOrderDetailDtoStatus';
 import type { AdminOrderItemDto } from './adminOrderItemDto';
 import type { AdminOrderPaymentDto } from './adminOrderPaymentDto';
@@ -15,6 +16,7 @@ import type { AdminOrderStatusHistoryDto } from './adminOrderStatusHistoryDto';
 import type { OrderCouponSnapshotDto } from './orderCouponSnapshotDto';
 
 export interface AdminOrderDetailDto {
+  shippingProvider?: AdminOrderDetailDtoShippingProvider;
   orderCouponDiscountAmount: number;
   shippingCouponDiscountAmount: number;
   appliedCoupons: OrderCouponSnapshotDto[];

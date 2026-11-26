@@ -60,6 +60,9 @@ import { synchronizeCheckoutState } from "@/features/checkout/state/checkout-sta
 import { subscribeInventoryInvalidation } from "@/features/storefront/state/inventory-sync-channel";
 import type { InventoryInvalidationContext } from "@/features/storefront/state/inventory-state";
 import { useStorefrontBranchStore } from "@/stores/storefront-branch.store";
+import { useAuthStore } from "@/stores/auth.store";
+import CheckoutShippingOptions from "@/features/checkout/components/CheckoutShippingOptions.vue";
+import { useGhnShippingQuote } from "@/features/checkout/composables/use-ghn-shipping-quote";
 
 const route = useRoute();
 const router = useRouter();
@@ -98,6 +101,40 @@ const addressInput = ref<
 >(null);
 const addressesQuery = useCustomerAddresses();
 const branchStore = useStorefrontBranchStore();
+const authStore = useAuthStore();
+const shippingProvider = ref<"INTERNAL" | "GHN">("INTERNAL");
+const internalQuote = computed(
+  () =>
+    draft.value?.internalShippingQuote ?? draft.value?.shippingQuote ?? null,
+);
+const ghnContextKey = computed(() =>
+  JSON.stringify({
+    principal: authStore.user?.id,
+    branch: [
+      branchStore.selectedBranchId,
+      draft.value?.branch.address,
+      draft.value?.branch.province,
+      draft.value?.branch.ward,
+    ],
+    items: draft.value?.items
+      .filter((item) => item.eligible)
+      .map((item) => [item.variantId, item.quantity, item.unitPrice]),
+    address: addressInput.value,
+    payment: paymentMethod.value,
+    coupons: paymentMethod.value === "COD" ? couponSelection.value : undefined,
+  }),
+);
+const ghn = useGhnShippingQuote({
+  enabled: () => Boolean(draft.value?.ghnEnabled && authStore.isAuthenticated),
+  ready: () =>
+    Boolean(
+      addressInput.value &&
+      draft.value?.branch.id === branchStore.selectedBranchId &&
+      draft.value.items.some((item) => item.eligible),
+    ),
+  contextKey: () => ghnContextKey.value,
+  payload: () => requestPayload(),
+});
 const placeOrderIdempotencyKeys = new Map<string, string>();
 const LOCATION_TOAST_ID = "checkout-current-location";
 const SAVED_ADDRESS_TOAST_ID = "checkout-saved-address-resolution";
@@ -148,6 +185,7 @@ const currentInputFingerprint = computed(() =>
     selectedCartItemIds: [...selectedCartItemIds.value].sort(),
     address: addressInput.value,
     paymentMethod: paymentMethod.value,
+    shippingProvider: shippingProvider.value,
     coupons: couponSelection.value,
     regularPriceCartItemIds: [...regularPriceCartItemIds.value].sort(),
   }),
@@ -188,20 +226,28 @@ const placeOrderBlocker = computed(() => {
     return "Vui lòng chọn hoặc áp dụng một địa chỉ giao hàng.";
   if (previewDirty.value) return "Thông tin thanh toán đang được cập nhật.";
   if (isPreviewPending.value) return "Đang cập nhật giá và phí vận chuyển.";
-  if (!draft.value?.shippingQuote) return "Chưa tính được phí vận chuyển.";
-  if (!draft.value.canPlaceOrder)
+  if (
+    shippingProvider.value === "GHN" &&
+    (ghn.loading.value ||
+      !ghn.quote.value ||
+      ghn.quotedContextKey.value !== ghnContextKey.value)
+  )
+    return ghn.error.value ?? "Đang xác minh phí và ngày giao hàng GHN.";
+  if (
+    shippingProvider.value === "GHN"
+      ? !draft.value?.ghnShippingQuote
+      : !draft.value?.shippingQuote
+  )
+    return "Chưa tính được phí vận chuyển.";
+  if (!draft.value?.canPlaceOrder)
     return (
-      draft.value.blockingIssues[0] ?? "Đơn hàng chưa đủ điều kiện để đặt."
+      draft.value?.blockingIssues[0] ?? "Đơn hàng chưa đủ điều kiện để đặt."
     );
   return null;
 });
 
 function formatPrice(value: number | null | undefined): string {
   return `${money.format(value ?? 0)}đ`;
-}
-
-function formatWeightGram(value: number): string {
-  return `${money.format(value)} g`;
 }
 
 function shippingRouteLabel(routeType: string): string {
@@ -215,6 +261,12 @@ function requestPayload(): PreviewCheckoutDto {
     selectedCartItemIds: selectedCartItemIds.value,
     ...(addressInput.value ? { address: addressInput.value } : {}),
     paymentMethod: paymentMethod.value,
+    shippingProvider: shippingProvider.value,
+    ...(shippingProvider.value === "GHN" &&
+    ghn.quotedContextKey.value === ghnContextKey.value &&
+    ghn.quote.value
+      ? { shippingQuoteReference: ghn.quote.value.quoteReference }
+      : {}),
     ...(note.value.trim() ? { note: note.value.trim() } : {}),
   } satisfies PreviewCheckoutDto;
 }
@@ -296,6 +348,9 @@ function checkoutErrorCode(error: unknown): string | undefined {
 }
 
 function checkoutErrorMessage(error: unknown): string {
+  if (isGhnShippingError(error)) {
+    return "Chưa thể xác nhận báo giá GHN. Vui lòng thử lại hoặc chọn giao hàng tiêu chuẩn.";
+  }
   if (checkoutErrorCode(error)?.startsWith("COUPON_"))
     return couponErrorMessage(error);
   if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -385,6 +440,7 @@ async function redirectAllInvalid(branchName: string): Promise<void> {
 }
 
 async function loadPreview(): Promise<void> {
+  if (!branchStore.selectedBranchId) return;
   if (selectedCartItemIds.value.length === 0) {
     toast.warning("Vui lòng chọn sản phẩm trong giỏ hàng trước.");
     await router.replace({ name: "client-cart" });
@@ -410,6 +466,8 @@ async function loadPreview(): Promise<void> {
       return;
     }
     draft.value = preview;
+    if (preview.ghnShippingQuote)
+      ghn.accept(preview.ghnShippingQuote, ghnContextKey.value);
     committedInputFingerprint.value = inputFingerprint;
     announcePartialAvailability(preview);
   } catch (error: unknown) {
@@ -421,6 +479,10 @@ async function loadPreview(): Promise<void> {
       return;
     }
     if (handleFlashChoice(error)) return;
+    if (isGhnShippingError(error)) {
+      ghn.reject(checkoutErrorMessage(error));
+      return;
+    }
     if (checkoutErrorCode(error)?.startsWith("COUPON_")) {
       couponNeedsConfirmation.value = true;
       couponDialogOpen.value = true;
@@ -460,6 +522,8 @@ async function refreshPreview(): Promise<void> {
       return;
     }
     draft.value = nextDraft;
+    if (nextDraft.ghnShippingQuote)
+      ghn.accept(nextDraft.ghnShippingQuote, ghnContextKey.value);
     committedInputFingerprint.value = inputFingerprint;
     announcePartialAvailability(nextDraft);
   } catch (error: unknown) {
@@ -471,6 +535,7 @@ async function refreshPreview(): Promise<void> {
       return;
     }
     if (handleFlashChoice(error)) return;
+    if (isGhnShippingError(error)) ghn.reject(checkoutErrorMessage(error));
     throw error;
   } finally {
     if (sequence === previewSequence) isPreviewPending.value = false;
@@ -712,6 +777,11 @@ async function placeOrder(): Promise<void> {
     const payment = await placeVnpayOrder(payload);
     window.location.assign(payment.paymentUrl);
   } catch (error: unknown) {
+    if (isGhnShippingError(error)) {
+      ghn.reject(checkoutErrorMessage(error));
+      toast.error(checkoutErrorMessage(error));
+      return;
+    }
     if (checkoutErrorCode(error)?.startsWith("COUPON_")) {
       couponNeedsConfirmation.value = true;
       couponDialogOpen.value = true;
@@ -766,6 +836,8 @@ function confirmCoupons(preview: CheckoutPreviewResponseDto): void {
       : {}),
   };
   draft.value = preview;
+  if (preview.ghnShippingQuote)
+    ghn.accept(preview.ghnShippingQuote, ghnContextKey.value);
   committedInputFingerprint.value = currentInputFingerprint.value;
   couponNeedsConfirmation.value = false;
   isPreviewPending.value = false;
@@ -793,6 +865,10 @@ watch(
 watch(
   () => branchStore.selectedBranchId,
   async (nextBranchId, previousBranchId) => {
+    if (!draft.value && nextBranchId && !isMutating.value) {
+      await loadPreview();
+      return;
+    }
     if (
       !draft.value ||
       !previousBranchId ||
@@ -854,6 +930,69 @@ onBeforeUnmount(() => {
   locationController?.abort();
   stopInventorySubscription();
 });
+
+function isGhnShippingError(error: unknown): boolean {
+  const code = checkoutErrorCode(error);
+  return Boolean(
+    code?.startsWith("GHN_") || code?.startsWith("SHIPPING_QUOTE_"),
+  );
+}
+
+async function changeShippingProvider(
+  value: "INTERNAL" | "GHN",
+): Promise<void> {
+  if (
+    value === shippingProvider.value ||
+    isMutating.value ||
+    (value === "GHN" && !ghn.quote.value)
+  )
+    return;
+  shippingProvider.value = value;
+  try {
+    await refreshPreview();
+  } catch (error: unknown) {
+    toast.error(checkoutErrorMessage(error));
+  }
+}
+
+async function retryGhnShipping(): Promise<void> {
+  await ghn.refresh();
+  if (shippingProvider.value === "GHN" && ghn.quote.value) {
+    try {
+      await refreshPreview();
+    } catch (error: unknown) {
+      toast.error(checkoutErrorMessage(error));
+    }
+  }
+}
+
+watch(
+  () => authStore.user?.id,
+  (next, previous) => {
+    if (previous && next !== previous) {
+      previewController?.abort();
+      ++previewSequence;
+      draft.value = null;
+      addressInput.value = null;
+      ghn.reject("Phiên đăng nhập đã thay đổi.");
+    }
+  },
+);
+
+watch(
+  () => [addressesQuery.data.value, draft.value?.branch.id] as const,
+  ([addresses, branchId]) => {
+    if (
+      !branchId ||
+      addressInput.value ||
+      showCurrentLocation.value ||
+      pendingSavedAddressId.value
+    )
+      return;
+    const address = addresses?.find((item) => item.isDefault);
+    if (address) void chooseSavedAddress(address.id);
+  },
+);
 </script>
 
 <template>
@@ -1094,9 +1233,6 @@ onBeforeUnmount(() => {
               Phương thức vận chuyển
             </h2>
             <div class="mt-5 rounded-xl border p-4">
-              <p class="border-b pb-4 text-sm font-semibold">
-                Giao hàng tiêu chuẩn
-              </p>
               <div class="grid gap-4 py-4 text-sm sm:grid-cols-[1fr_auto_1fr]">
                 <div>
                   <strong>Địa chỉ gửi (Từ)</strong>
@@ -1112,42 +1248,23 @@ onBeforeUnmount(() => {
                   </p>
                 </div>
               </div>
-              <div
-                class="flex w-full items-center justify-between rounded-xl border border-green-200 bg-green-50/50 p-4 text-left"
-              >
-                <span class="flex items-center gap-3">
-                  <span
-                    class="grid size-5 place-items-center rounded-full border-2 border-green-600"
-                    ><span class="size-2.5 rounded-full bg-green-600"
-                  /></span>
-                  <span>
-                    <strong class="block">Giao hàng tiêu chuẩn</strong>
-                    <small class="text-slate-500">
-                      Phí theo tuyến, loại địa chỉ và khối lượng tính cước
-                    </small>
-                  </span>
-                </span>
-                <strong>{{
-                  draft.shippingQuote ? formatPrice(draft.shippingFee) : "—"
-                }}</strong>
-              </div>
-              <div
-                v-if="draft.shippingQuote"
-                class="mt-3 grid gap-1 text-sm text-slate-600 sm:grid-cols-2"
-              >
-                <p>
-                  Trọng lượng tính cước:
-                  <strong>{{
-                    formatWeightGram(draft.shippingQuote.chargeableWeightGram)
-                  }}</strong>
-                </p>
-                <p>
-                  Tuyến:
-                  <strong>{{
-                    shippingRouteLabel(draft.shippingQuote.routeType)
-                  }}</strong>
-                </p>
-              </div>
+              <CheckoutShippingOptions
+                :model-value="shippingProvider"
+                :internal-quote="internalQuote"
+                :internal-route="
+                  internalQuote
+                    ? shippingRouteLabel(internalQuote.routeType)
+                    : ''
+                "
+                :ghn-enabled="Boolean(draft.ghnEnabled)"
+                :ghn-quote="ghn.quote.value"
+                :ghn-loading="ghn.loading.value"
+                :ghn-error="ghn.error.value"
+                :has-address="Boolean(addressInput)"
+                :disabled="isMutating"
+                @update:model-value="changeShippingProvider"
+                @retry="retryGhnShipping"
+              />
               <p v-if="!addressInput" class="mt-3 text-sm text-slate-500">
                 Chọn địa chỉ để tính phí vận chuyển.
               </p>

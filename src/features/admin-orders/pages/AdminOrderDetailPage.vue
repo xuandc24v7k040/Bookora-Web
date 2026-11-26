@@ -438,7 +438,13 @@ function backToList(): void {
                   <p class="mt-1 text-sm text-muted-foreground">
                     {{ order.shippingAddress }}
                   </p>
-                  <p class="mt-2 text-sm">Giao hàng tiêu chuẩn</p>
+                  <p class="mt-2 text-sm">
+                    {{
+                      order.shippingProvider === "GHN"
+                        ? "Giao Hàng Nhanh"
+                        : "Giao hàng tiêu chuẩn"
+                    }}
+                  </p>
                   <p
                     v-if="order.estimatedDeliveryAt"
                     class="mt-1 text-sm text-muted-foreground"

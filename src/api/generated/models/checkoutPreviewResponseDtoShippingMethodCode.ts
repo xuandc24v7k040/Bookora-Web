@@ -11,4 +11,5 @@ export type CheckoutPreviewResponseDtoShippingMethodCode = typeof CheckoutPrevie
 
 export const CheckoutPreviewResponseDtoShippingMethodCode = {
   STANDARD: 'STANDARD',
+  GHN: 'GHN',
 } as const;

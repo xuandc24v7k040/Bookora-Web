@@ -12,10 +12,18 @@ import type { CheckoutItemResponseDto } from './checkoutItemResponseDto';
 import type { CheckoutPreviewResponseDtoPaymentMethod } from './checkoutPreviewResponseDtoPaymentMethod';
 import type { CheckoutPreviewResponseDtoShippingFeeRule } from './checkoutPreviewResponseDtoShippingFeeRule';
 import type { CheckoutPreviewResponseDtoShippingMethodCode } from './checkoutPreviewResponseDtoShippingMethodCode';
+import type { CheckoutPreviewResponseDtoShippingProvider } from './checkoutPreviewResponseDtoShippingProvider';
+import type { GhnShippingQuoteDto } from './ghnShippingQuoteDto';
 import type { OrderCouponSnapshotDto } from './orderCouponSnapshotDto';
 import type { ShippingQuoteResponseDto } from './shippingQuoteResponseDto';
 
 export interface CheckoutPreviewResponseDto {
+  shippingProvider?: CheckoutPreviewResponseDtoShippingProvider;
+  ghnEnabled?: boolean;
+  /** @nullable */
+  ghnShippingQuote?: GhnShippingQuoteDto | null;
+  /** @nullable */
+  internalShippingQuote?: ShippingQuoteResponseDto | null;
   orderCouponDiscountAmount: number;
   shippingCouponDiscountAmount: number;
   appliedCoupons: OrderCouponSnapshotDto[];

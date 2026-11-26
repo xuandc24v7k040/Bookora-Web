@@ -22,7 +22,7 @@ import {
   getCustomerOrder,
 } from "@/features/orders/api/customer-orders-api";
 import CustomerReceiptConfirmationAction from "@/features/orders/components/CustomerReceiptConfirmationAction.vue";
-import SupportOrderContact from '@/features/support/components/SupportOrderContact.vue';
+import SupportOrderContact from "@/features/support/components/SupportOrderContact.vue";
 import { ORDER_DETAIL_QUERY_POLICY } from "@/features/orders/api/order-query-policy";
 import {
   customerOrderStatusLabel,
@@ -120,7 +120,10 @@ const money = new Intl.NumberFormat("vi-VN");
         ><ArrowLeft class="size-4" /> Trở lại</RouterLink
       >
     </Button>
-    <div v-if="orderQuery.data.value && !orderQuery.isError.value" class="space-y-5">
+    <div
+      v-if="orderQuery.data.value && !orderQuery.isError.value"
+      class="space-y-5"
+    >
       <section class="rounded-xl border bg-white p-5">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -285,7 +288,27 @@ const money = new Intl.NumberFormat("vi-VN");
         <div>
           <h2 class="font-bold">Vận chuyển</h2>
           <p class="mt-2 text-sm">{{ orderQuery.data.value.branchName }}</p>
-          <p class="text-sm text-slate-500">Giao hàng tiêu chuẩn</p>
+          <p class="text-sm text-slate-500">
+            {{
+              orderQuery.data.value.shippingProvider === "GHN"
+                ? "Giao Hàng Nhanh"
+                : "Giao hàng tiêu chuẩn"
+            }}
+          </p>
+          <p
+            v-if="
+              orderQuery.data.value.shippingProvider === 'GHN' &&
+              orderQuery.data.value.estimatedDeliveryAt
+            "
+            class="text-sm text-slate-500"
+          >
+            Dự kiến giao hàng:
+            {{
+              new Intl.DateTimeFormat("vi-VN", {
+                timeZone: "Asia/Ho_Chi_Minh",
+              }).format(new Date(orderQuery.data.value.estimatedDeliveryAt))
+            }}
+          </p>
           <p class="mt-1 text-sm">
             Phí: {{ money.format(orderQuery.data.value.shippingFee) }}đ
           </p>
@@ -320,12 +343,23 @@ const money = new Intl.NumberFormat("vi-VN");
         <Ban class="size-4" /> Hủy đơn hàng
       </Button>
     </div>
-    <p v-else-if="orderQuery.isFetching.value" class="py-8 text-sm text-muted-foreground" role="status">
+    <p
+      v-else-if="orderQuery.isFetching.value"
+      class="py-8 text-sm text-muted-foreground"
+      role="status"
+    >
       Đang tải thông tin đơn hàng...
     </p>
     <div v-else class="rounded-xl border p-5" role="alert">
-      <p class="text-sm text-muted-foreground">Không thể tải thông tin đơn hàng. Vui lòng thử lại.</p>
-      <Button class="mt-3 cursor-pointer" variant="outline" @click="orderQuery.refetch()">Thử lại</Button>
+      <p class="text-sm text-muted-foreground">
+        Không thể tải thông tin đơn hàng. Vui lòng thử lại.
+      </p>
+      <Button
+        class="mt-3 cursor-pointer"
+        variant="outline"
+        @click="orderQuery.refetch()"
+        >Thử lại</Button
+      >
     </div>
     <AlertDialog
       v-if="orderQuery.data.value && !orderQuery.isError.value"

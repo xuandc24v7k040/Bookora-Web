@@ -7,6 +7,7 @@ import checkoutStateSyncSource from "@/features/checkout/state/checkout-state-sy
 import inventoryStateSource from "@/features/storefront/state/inventory-state.ts?raw";
 import inventorySyncSource from "@/features/storefront/state/inventory-sync-channel.ts?raw";
 import checkoutSource from "./CheckoutPage.vue?raw";
+import shippingSource from "@/features/checkout/components/CheckoutShippingOptions.vue?raw";
 import paymentResultSource from "./PaymentResultPage.vue?raw";
 import successSource from "./CheckoutSuccessPage.vue?raw";
 
@@ -214,8 +215,8 @@ describe("Phase 15 checkout UI hotfix contract", () => {
     expect(checkoutSource).toContain("<RadioGroupItem");
     expect(checkoutSource).toContain('alt="VNPAY"');
     expect(checkoutSource).toContain("/Icon-VNPAY-QR.webp");
-    expect(checkoutSource).toContain("Giao hàng tiêu chuẩn");
-    expect(checkoutSource).toContain(
+    expect(shippingSource).toContain("Giao hàng tiêu chuẩn");
+    expect(shippingSource).toContain(
       "Phí theo tuyến, loại địa chỉ và khối lượng tính cước",
     );
     expect(checkoutSource).not.toContain("báo giá giao hàng thực tế");

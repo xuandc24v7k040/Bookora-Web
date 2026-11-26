@@ -10,11 +10,15 @@ import type { CustomerOrderItemResponseDto } from './customerOrderItemResponseDt
 import type { CustomerOrderReceiptConfirmationDto } from './customerOrderReceiptConfirmationDto';
 import type { CustomerOrderResponseDtoPaymentMethod } from './customerOrderResponseDtoPaymentMethod';
 import type { CustomerOrderResponseDtoPaymentStatus } from './customerOrderResponseDtoPaymentStatus';
+import type { CustomerOrderResponseDtoShippingProvider } from './customerOrderResponseDtoShippingProvider';
 import type { CustomerOrderResponseDtoStatus } from './customerOrderResponseDtoStatus';
 import type { CustomerOrderReviewActionDto } from './customerOrderReviewActionDto';
 import type { OrderCouponSnapshotDto } from './orderCouponSnapshotDto';
 
 export interface CustomerOrderResponseDto {
+  shippingProvider?: CustomerOrderResponseDtoShippingProvider;
+  /** @nullable */
+  estimatedDeliveryAt?: string | null;
   orderCouponDiscountAmount: number;
   shippingCouponDiscountAmount: number;
   appliedCoupons: OrderCouponSnapshotDto[];

@@ -7,9 +7,16 @@
  */
 import type { CurrentLocationAddressDto } from './currentLocationAddressDto';
 import type { PreviewCheckoutDtoPaymentMethod } from './previewCheckoutDtoPaymentMethod';
+import type { PreviewCheckoutDtoShippingProvider } from './previewCheckoutDtoShippingProvider';
 import type { SavedAddressInputDto } from './savedAddressInputDto';
 
 export interface PreviewCheckoutDto {
+  shippingProvider?: PreviewCheckoutDtoShippingProvider;
+  /**
+     * @minLength 20
+     * @maxLength 1024
+     */
+  shippingQuoteReference?: string;
   /**
      * Các CartItem khách xác nhận mua toàn bộ với giá catalog, không hưởng Flash Sale
      * @maxItems 50

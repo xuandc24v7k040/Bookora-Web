@@ -7,9 +7,16 @@
  */
 import type { CurrentLocationAddressDto } from './currentLocationAddressDto';
 import type { PlaceOrderDtoPaymentMethod } from './placeOrderDtoPaymentMethod';
+import type { PlaceOrderDtoShippingProvider } from './placeOrderDtoShippingProvider';
 import type { SavedAddressInputDto } from './savedAddressInputDto';
 
 export interface PlaceOrderDto {
+  shippingProvider?: PlaceOrderDtoShippingProvider;
+  /**
+     * @minLength 20
+     * @maxLength 1024
+     */
+  shippingQuoteReference?: string;
   /**
      * Các CartItem khách xác nhận mua toàn bộ với giá catalog, không hưởng Flash Sale
      * @maxItems 50

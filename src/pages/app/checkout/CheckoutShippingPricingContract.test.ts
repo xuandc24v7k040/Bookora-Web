@@ -1,12 +1,11 @@
 import { describe, expect, it } from "vitest";
 import checkoutSource from "./CheckoutPage.vue?raw";
+import shippingSource from "@/features/checkout/components/CheckoutShippingOptions.vue?raw";
 
 describe("checkout dynamic shipping pricing contract", () => {
   it("renders only authoritative quote fields returned by the backend", () => {
-    expect(checkoutSource).toContain(
-      "draft.shippingQuote.chargeableWeightGram",
-    );
-    expect(checkoutSource).toContain("draft.shippingQuote.routeType");
+    expect(shippingSource).toContain("internalQuote.chargeableWeightGram");
+    expect(checkoutSource).toContain("internalQuote.routeType");
     expect(checkoutSource).not.toContain("Phí vận chuyển cố định");
   });
 
