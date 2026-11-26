@@ -27,6 +27,21 @@ const props = {
 };
 
 describe("Checkout carrier radio cards", () => {
+  it("keeps the original local GHN logo beside its title without the truck icon", () => {
+    const wrapper = mount(CheckoutShippingOptions, { props });
+    const label = wrapper.get('label[for="shipping-ghn"]');
+    const logo = label.get('img[src="/ghn-logo.png"]');
+    expect(logo.attributes("alt")).toBe("");
+    expect(logo.element.parentElement?.textContent).toContain(
+      "Giao Hàng Nhanh",
+    );
+    expect(label.find(".lucide-truck").exists()).toBe(false);
+    expect(label.find(".lucide-calendar-clock").exists()).toBe(true);
+    expect(
+      wrapper.get('label[for="shipping-internal"]').find("img").exists(),
+    ).toBe(false);
+    wrapper.unmount();
+  });
   it("selects INTERNAL by default, exposes GHN by keyboard, and shows canonical fee/date", async () => {
     const wrapper = mount(CheckoutShippingOptions, {
       props,

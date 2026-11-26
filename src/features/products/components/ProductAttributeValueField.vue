@@ -24,7 +24,7 @@ function updateText(value: string | number): void {
 </script>
 
 <template>
-  <label v-if="attribute.type === 'BOOLEAN'" class="flex h-9 items-center gap-2 text-sm">
+  <label v-if="attribute.type === 'BOOLEAN'" class="has-[:enabled]:cursor-pointer flex h-9 items-center gap-2 text-sm">
     <Checkbox
       :model-value="modelValue === true"
       @update:model-value="emit('update:modelValue', $event === true)"

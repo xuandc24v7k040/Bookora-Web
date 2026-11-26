@@ -167,7 +167,7 @@ async function accept(files: FileList | null): Promise<void> {
       :class="[
         compact
           ? 'size-24 shrink-0 cursor-pointer border border-[var(--bookora-green)] text-[var(--bookora-green)] hover:bg-[var(--bookora-green)]/5 disabled:cursor-not-allowed sm:size-28'
-          : 'w-full border-2 px-5 py-8 hover:bg-muted/40',
+          : 'enabled:cursor-pointer w-full border-2 px-5 py-8 hover:bg-muted/40',
         isDragging
           ? 'border-primary bg-primary/5'
           : !compact && 'border-muted-foreground/25',

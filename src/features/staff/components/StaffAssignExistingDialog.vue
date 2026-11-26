@@ -259,7 +259,7 @@ async function submit(): Promise<void> {
                 v-for="candidate in candidates"
                 :key="candidate.id"
                 type="button"
-                class="flex w-full items-start gap-3 border-b p-3 text-left last:border-b-0 hover:bg-muted/50"
+                class="enabled:cursor-pointer flex w-full items-start gap-3 border-b p-3 text-left last:border-b-0 hover:bg-muted/50"
                 @click="selectCandidate(candidate.id)"
               >
                 <span

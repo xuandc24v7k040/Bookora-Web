@@ -340,7 +340,7 @@ function confirmDelete(): void {
           <button
             v-if="!address.isDefault"
             type="button"
-            class="px-3 hover:text-[var(--bookora-green)]"
+            class="enabled:cursor-pointer px-3 hover:text-[var(--bookora-green)]"
             :disabled="defaultMutation.isPending.value"
             @click="defaultMutation.mutate(address.id)"
           >
@@ -348,14 +348,14 @@ function confirmDelete(): void {
           </button>
           <button
             type="button"
-            class="px-3 hover:text-destructive"
+            class="enabled:cursor-pointer px-3 hover:text-destructive"
             @click="askDelete(address)"
           >
             Xóa
           </button>
           <button
             type="button"
-            class="px-3 hover:text-[var(--bookora-green)]"
+            class="enabled:cursor-pointer px-3 hover:text-[var(--bookora-green)]"
             @click="openEdit(address)"
           >
             Cập nhật
@@ -460,7 +460,7 @@ function confirmDelete(): void {
                 type="button"
                 role="switch"
                 :aria-checked="form.isDefault"
-                class="relative h-6 w-11 rounded-full transition-colors"
+                class="enabled:cursor-pointer relative h-6 w-11 rounded-full transition-colors"
                 :class="
                   form.isDefault ? 'bg-[var(--bookora-green)]' : 'bg-muted'
                 "

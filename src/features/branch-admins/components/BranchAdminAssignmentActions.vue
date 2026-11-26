@@ -272,7 +272,7 @@ async function submit(): Promise<void> {
                   v-for="item in replacements"
                   :key="item.id"
                   type="button"
-                  class="w-full rounded-md border p-3 text-left hover:bg-muted/50"
+                  class="enabled:cursor-pointer w-full rounded-md border p-3 text-left hover:bg-muted/50"
                   :class="
                     replacementBranchId === item.branchId
                       ? 'border-primary bg-primary/5'

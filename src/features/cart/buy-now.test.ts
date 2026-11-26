@@ -3,7 +3,11 @@ import type {
   CartResponseDto,
   CheckoutPreviewResponseDto,
 } from "@/api/generated/models";
-import { prepareBuyNow, needsFlashConfirmation } from "./buy-now";
+import {
+  BuyNowSelectionError,
+  prepareBuyNow,
+  needsFlashConfirmation,
+} from "./buy-now";
 import type { useCartActions } from "./api/cart-api";
 const item = {
   cartItemId: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
@@ -14,12 +18,10 @@ const item = {
 function fixture(existing = false) {
   const cart = { branch: { id: "branch" }, items: [item] } as CartResponseDto;
   const actions = {
-    refresh: vi
-      .fn()
-      .mockResolvedValue({
-        ...cart,
-        items: existing ? [{ ...item, quantity: 5 }] : [],
-      }),
+    refresh: vi.fn().mockResolvedValue({
+      ...cart,
+      items: existing ? [{ ...item, quantity: 5 }] : [],
+    }),
     add: vi.fn().mockResolvedValue(cart),
     update: vi.fn().mockResolvedValue(cart),
     remove: vi.fn(),
@@ -47,13 +49,107 @@ describe("Buy Now selection and Flash Sale intent", () => {
     });
     expect(navigation.query).not.toHaveProperty("regularPriceCartItemIds");
   });
-  it("replaces existing cart quantity rather than silently adding it to the purchase", async () => {
+  it.each([1, 5])(
+    "replaces existing quantity %i with the exact requested quantity without touching other lines",
+    async (quantity) => {
+      const { actions, cart } = fixture();
+      const other = {
+        ...item,
+        productVariantId: "other",
+        cartItemId: "other-item",
+        quantity: 3,
+      };
+      vi.mocked(actions.refresh).mockResolvedValue({
+        ...cart,
+        items: [{ ...item, quantity }, other],
+      } as CartResponseDto);
+      vi.mocked(actions.update).mockResolvedValue({
+        ...cart,
+        items: [item, other],
+      } as CartResponseDto);
+      const navigation = await prepareBuyNow(
+        actions, "selected", 2, "branch", "offer",
+      );
+      expect(actions.update).toHaveBeenCalledExactlyOnceWith(item.cartItemId, {
+        quantity: 2,
+      });
+      expect(actions.add).not.toHaveBeenCalled();
+      expect(actions.remove).not.toHaveBeenCalled();
+      expect(actions.changeBranch).not.toHaveBeenCalled();
+      expect(other.quantity).toBe(3);
+      expect(navigation.query).toEqual({
+        items: item.cartItemId,
+        flashOffer: "offer",
+      });
+    },
+  );
+  it("rejects failed updates without falling back to an additive mutation", async () => {
     const { actions } = fixture(true);
-    await prepareBuyNow(actions, "selected", 2, "branch");
-    expect(actions.update).toHaveBeenCalledWith(item.cartItemId, {
-      quantity: 2,
-    });
+    vi.mocked(actions.update).mockRejectedValueOnce(
+      new Error("insufficient stock"),
+    );
+    await expect(
+      prepareBuyNow(actions, "selected", 2, "branch"),
+    ).rejects.toThrow("insufficient stock");
     expect(actions.add).not.toHaveBeenCalled();
+  });
+  it.each([
+    { branch: { id: "other" }, items: [item] },
+    { branch: { id: "branch" }, items: [] },
+    { branch: { id: "branch" }, items: [{ ...item, quantity: 5 }] },
+    { branch: { id: "branch" }, items: [{ ...item, isCheckoutEligible: false }] },
+  ])("rejects stale, mismatched or ineligible update responses: %j", async (response) => {
+    const { actions } = fixture(true);
+    vi.mocked(actions.update).mockResolvedValue(response as CartResponseDto);
+    await expect(
+      prepareBuyNow(actions, "selected", 2, "branch"),
+    ).rejects.toThrow(BuyNowSelectionError);
+  });
+  it("does not navigate with an update returned after the session or selection changes", async () => {
+    const { actions } = fixture(true);
+    const isCurrent = vi.fn().mockReturnValueOnce(true).mockReturnValue(false);
+    await expect(
+      prepareBuyNow(actions, "selected", 2, "branch", undefined, isCurrent),
+    ).rejects.toThrow(BuyNowSelectionError);
+    expect(actions.update).toHaveBeenCalledOnce();
+  });
+  it("reuses a matching existing item and selects only it from multiple cart lines", async () => {
+    const { actions, cart } = fixture();
+    vi.mocked(actions.refresh).mockResolvedValue({
+      ...cart,
+      items: [
+        item,
+        {
+          ...item,
+          productVariantId: "other",
+          cartItemId: "01ARZ3NDEKTSV4RRFFQ69G5FAW",
+          quantity: 5,
+        },
+      ],
+    } as CartResponseDto);
+    const navigation = await prepareBuyNow(actions, "selected", 2, "branch");
+    expect(navigation.query).toEqual({ items: item.cartItemId });
+    expect(actions.add).not.toHaveBeenCalled();
+    expect(actions.update).not.toHaveBeenCalled();
+  });
+  it("does not mutate after the session or selection changes during refresh", async () => {
+    const { actions } = fixture();
+    await expect(
+      prepareBuyNow(actions, "selected", 2, "branch", undefined, () => false),
+    ).rejects.toThrow("lựa chọn");
+    expect(actions.add).not.toHaveBeenCalled();
+    expect(actions.update).not.toHaveBeenCalled();
+  });
+  it("rejects mutation failure and a context changed while adding", async () => {
+    const { actions } = fixture();
+    vi.mocked(actions.add).mockRejectedValueOnce(new Error("network"));
+    await expect(
+      prepareBuyNow(actions, "selected", 2, "branch"),
+    ).rejects.toThrow("network");
+    const isCurrent = vi.fn().mockReturnValueOnce(true).mockReturnValue(false);
+    await expect(
+      prepareBuyNow(actions, "selected", 2, "branch", undefined, isCurrent),
+    ).rejects.toThrow("Sản phẩm");
   });
   it("rejects stale branch and mismatched response before navigation", async () => {
     const { actions, cart } = fixture();

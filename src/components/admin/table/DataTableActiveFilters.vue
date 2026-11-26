@@ -220,7 +220,7 @@ function resetFilters() {
       <button
         type="button"
         :aria-label="`Xóa điều kiện ${filter.label}`"
-        class="ml-0.5 flex size-5 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring/30"
+        class="enabled:cursor-pointer ml-0.5 flex size-5 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring/30"
         @click="removeFilter(filter)"
       >
         <X class="h-3.5 w-3.5" />

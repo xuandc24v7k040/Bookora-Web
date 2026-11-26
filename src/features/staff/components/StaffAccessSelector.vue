@@ -311,7 +311,7 @@ function togglePermission(id: string, checked: boolean): void {
                 <label
                   v-for="permission in permissions"
                   :key="permission.id"
-                  class="flex items-start gap-3 p-3 hover:bg-muted/50"
+                  class="has-[:enabled]:cursor-pointer flex items-start gap-3 p-3 hover:bg-muted/50"
                 >
                   <Checkbox
                     :model-value="

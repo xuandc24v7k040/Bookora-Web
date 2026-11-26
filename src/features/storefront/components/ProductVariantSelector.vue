@@ -67,7 +67,7 @@ function choose(optionId: string, optionValueId: string): void {
           :aria-disabled="isValueDisabled(option.id, value.id)"
           :aria-pressed="selectedValues.get(option.id) === value.id"
           :title="unavailableTitle(option.id, value.id)"
-          class="min-h-11 rounded-lg border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)] disabled:cursor-not-allowed disabled:opacity-40"
+          class="enabled:cursor-pointer min-h-11 rounded-lg border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)] disabled:cursor-not-allowed disabled:opacity-40"
           :class="selectedValues.get(option.id) === value.id
             ? 'border-[var(--bookora-green)] bg-[var(--bookora-soft)] text-[var(--bookora-green)]'
             : isValueDisabled(option.id, value.id)

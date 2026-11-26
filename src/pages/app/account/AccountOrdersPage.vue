@@ -184,7 +184,7 @@ async function changePage(page: number, replace = false): Promise<void> {
           type="button"
           role="tab"
           :aria-selected="tab.key === activeTab.key"
-          class="border-b-2 px-1 pb-3 text-sm font-semibold whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
+          class="enabled:cursor-pointer border-b-2 px-1 pb-3 text-sm font-semibold whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
           :class="
             tab.key === activeTab.key
               ? 'border-[var(--bookora-green)] text-[var(--bookora-green)]'

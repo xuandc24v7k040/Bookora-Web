@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CalendarClock, PackageCheck, RefreshCw, Truck } from "@lucide/vue";
+import { CalendarClock, PackageCheck, RefreshCw } from "@lucide/vue";
 import type {
   GhnShippingQuoteDto,
   ShippingQuoteResponseDto,
@@ -121,12 +121,19 @@ function select(value: unknown): void {
           <div
             class="flex flex-wrap items-start justify-between gap-x-3 gap-y-1"
           >
-            <span class="flex items-center gap-2 font-semibold"
-              ><Truck class="size-4 shrink-0 text-[var(--bookora-green)]" />Giao
-              Hàng Nhanh</span
-            >
-            <Skeleton v-if="ghnLoading" class="h-5 w-20" />
-            <strong v-else class="whitespace-nowrap text-sm">{{
+            <span class="flex items-center gap-2 font-semibold">
+              <span>Giao Hàng Nhanh</span>
+              <span aria-hidden="true" class="h-4 border-l border-slate-200" />
+              <img
+                :src="'/ghn-logo.png'"
+                alt=""
+                width="700"
+                height="400"
+                class="h-auto w-14 shrink-0 object-contain"
+              />
+            </span>
+            <Skeleton v-if="ghnLoading" class="ml-auto h-5 w-20" />
+            <strong v-else class="ml-auto whitespace-nowrap text-sm">{{
               ghnQuote ? formatVnd(ghnQuote.shippingFee) : "—"
             }}</strong>
           </div>

@@ -11,7 +11,7 @@ const forwarded = useForwardPropsEmits(props, emit);
   <SwitchRoot
     v-bind="forwarded"
     data-slot="switch"
-    class="inline-flex h-5 w-9 shrink-0 items-center rounded-full border border-transparent bg-input p-0.5 transition-colors outline-none focus-visible:ring-ring/50 focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary"
+    class="[:where(&:not(:disabled):not([aria-disabled=true]):not([data-disabled]):not([data-unavailable]))]:cursor-pointer inline-flex h-5 w-9 shrink-0 items-center rounded-full border border-transparent bg-input p-0.5 transition-colors outline-none focus-visible:ring-ring/50 focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary"
   >
     <SwitchThumb
       data-slot="switch-thumb"

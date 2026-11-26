@@ -128,7 +128,7 @@ function onSearchKeydown(event: KeyboardEvent): void {
       </p>
       <ScrollArea v-else class="h-[min(16rem,calc(100dvh-10rem))]">
         <div role="listbox" class="p-1">
-          <button
+          <button class="enabled:cursor-pointer"
             v-for="(option, index) in filteredOptions"
             :id="`administrative-option-${option.code}`"
             :key="option.code"

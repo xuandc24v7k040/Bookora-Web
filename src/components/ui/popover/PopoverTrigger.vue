@@ -7,7 +7,7 @@ const props = defineProps<PopoverTriggerProps>()
 
 <template>
   <PopoverTrigger
-    data-slot="popover-trigger"
+    data-slot="popover-trigger" class="[:where(&:not(:disabled):not([aria-disabled=true]):not([data-disabled]):not([data-unavailable]))]:cursor-pointer"
     v-bind="props"
   >
     <slot />

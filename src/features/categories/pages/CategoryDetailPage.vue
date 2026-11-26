@@ -164,7 +164,7 @@ const previewOpen = ref(false);
             ><button
               v-if="category.imageUrl"
               type="button"
-              class="w-full overflow-hidden rounded-lg border"
+              class="enabled:cursor-pointer w-full overflow-hidden rounded-lg border"
               @click="previewOpen = true"
             >
               <img

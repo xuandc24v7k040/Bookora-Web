@@ -186,7 +186,7 @@ function save(): void {
             <div class="flex flex-wrap items-center justify-between gap-3">
               <h3 id="coupon-general-heading" class="text-sm font-semibold">Thông tin chung</h3>
               <div class="flex items-center gap-2">
-                <Label for="coupon-active">Kích hoạt</Label>
+                <Label for="coupon-active" class="has-[+:enabled]:cursor-pointer">Kích hoạt</Label>
                 <Switch id="coupon-active" v-model="form.isActive" :disabled="pending" />
               </div>
             </div>

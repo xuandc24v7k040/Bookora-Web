@@ -25,7 +25,7 @@ import { storefrontErrorMessage } from "@/features/storefront/utils/storefront-e
 import { buildPrimaryCategoryBreadcrumb } from "@/features/storefront/utils/product-breadcrumb";
 import { useStorefrontBranchStore } from "@/stores/storefront-branch.store";
 import { useAuthStore } from "@/stores/auth.store";
-import { prepareBuyNow } from "@/features/cart/buy-now";
+import { BuyNowSelectionError, prepareBuyNow } from "@/features/cart/buy-now";
 import { useCartActions } from "@/features/cart/api/cart-api";
 import { cartErrorMessage } from "@/features/cart/utils/cart-error";
 import { resolveProductMetadata } from "@/features/storefront/utils/resolved-product-metadata";
@@ -187,25 +187,27 @@ async function addToCart(buyNow = false): Promise<void> {
 
   cartPending.value = true;
   try {
-    if (buyNow && activeFlashOffer.value) {
+    if (buyNow) {
       const branchId = branchStore.selectedBranchId;
       const variantId = selectedVariant.value.id;
+      const requestedQuantity = quantity.value;
+      const userId = authStore.user.id;
+      const sourcePath = route.fullPath;
+      const isCurrent = () =>
+        branchStore.selectedBranchId === branchId &&
+        selectedVariant.value?.id === variantId &&
+        quantity.value === requestedQuantity &&
+        authStore.user?.id === userId &&
+        authStore.user?.type === "CUSTOMER" &&
+        route.fullPath === sourcePath;
       const navigation = await prepareBuyNow(
         cartActions,
         variantId,
-        quantity.value,
+        requestedQuantity,
         branchId,
         activeFlashOffer.value?.itemId,
+        isCurrent,
       );
-      if (
-        branchStore.selectedBranchId !== branchId ||
-        selectedVariant.value?.id !== variantId
-      ) {
-        toast.info(
-          "Chi nhánh hoặc phiên bản đã thay đổi. Vui lòng kiểm tra và bấm mua lại.",
-        );
-        return;
-      }
       await router.push(navigation);
       return;
     }
@@ -214,12 +216,15 @@ async function addToCart(buyNow = false): Promise<void> {
         productVariantId: selectedVariant.value.id,
         quantity: quantity.value,
       },
-      buyNow ? "BUY_NOW" : "ADD_ITEM",
+      "ADD_ITEM",
     );
     toast.success("Đã thêm sản phẩm vào giỏ hàng.");
-    if (buyNow) await router.push("/cart");
   } catch (error: unknown) {
-    toast.error(cartErrorMessage(error));
+    toast.error(
+      error instanceof BuyNowSelectionError
+        ? error.message
+        : cartErrorMessage(error),
+    );
   } finally {
     cartPending.value = false;
   }
@@ -455,7 +460,7 @@ async function addToCart(buyNow = false): Promise<void> {
           <div class="flex gap-6 border-b">
             <button
               type="button"
-              class="border-b-2 px-2 pb-3 text-sm font-semibold"
+              class="enabled:cursor-pointer border-b-2 px-2 pb-3 text-sm font-semibold"
               :class="
                 activeTab === 'description'
                   ? 'border-[var(--bookora-green)] text-[var(--bookora-green)]'
@@ -466,7 +471,7 @@ async function addToCart(buyNow = false): Promise<void> {
               Mô tả sản phẩm</button
             ><button
               type="button"
-              class="border-b-2 px-2 pb-3 text-sm font-semibold"
+              class="enabled:cursor-pointer border-b-2 px-2 pb-3 text-sm font-semibold"
               :class="
                 activeTab === 'details'
                   ? 'border-[var(--bookora-green)] text-[var(--bookora-green)]'
@@ -477,7 +482,7 @@ async function addToCart(buyNow = false): Promise<void> {
               Thông tin chi tiết</button
             ><button
               type="button"
-              class="border-b-2 px-2 pb-3 text-sm font-semibold"
+              class="enabled:cursor-pointer border-b-2 px-2 pb-3 text-sm font-semibold"
               :class="
                 activeTab === 'reviews'
                   ? 'border-[var(--bookora-green)] text-[var(--bookora-green)]'

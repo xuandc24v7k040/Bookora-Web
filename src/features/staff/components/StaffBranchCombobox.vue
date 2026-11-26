@@ -109,7 +109,7 @@ function handleKeydown(event: KeyboardEvent): void {
               type="button"
               role="option"
               :aria-selected="option.id === modelValue"
-              class="flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left text-sm outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+              class="enabled:cursor-pointer flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left text-sm outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
               :class="index === activeIndex ? 'bg-muted' : ''"
               @mouseenter="activeIndex = index"
               @click="select(option.id)"

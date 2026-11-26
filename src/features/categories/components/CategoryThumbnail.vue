@@ -11,7 +11,7 @@ const previewOpen = ref(false);
   <button
     v-if="src"
     type="button"
-    class="group relative h-10 w-10 shrink-0 overflow-hidden rounded border"
+    class="enabled:cursor-pointer group relative h-10 w-10 shrink-0 overflow-hidden rounded border"
     :aria-label="`Xem ảnh ${alt}`"
     @click="previewOpen = true"
   >

@@ -327,7 +327,7 @@ async function appoint(): Promise<void> {
                       v-for="candidate in candidates"
                       :key="candidate.id"
                       type="button"
-                      class="flex w-full min-w-0 items-center gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50"
+                      class="enabled:cursor-pointer flex w-full min-w-0 items-center gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50"
                       :class="
                         selectedId === candidate.id
                           ? 'border-primary bg-primary/5'

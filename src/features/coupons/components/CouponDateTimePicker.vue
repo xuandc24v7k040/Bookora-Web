@@ -168,7 +168,7 @@ function confirm() {
                       v-for="value in list.options"
                       :key="value"
                       :value="value"
-                      class="h-7 rounded text-xs tabular-nums hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none data-[state=checked]:bg-primary data-[state=checked]:font-medium data-[state=checked]:text-primary-foreground"
+                      class="enabled:cursor-pointer h-7 rounded text-xs tabular-nums hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none data-[state=checked]:bg-primary data-[state=checked]:font-medium data-[state=checked]:text-primary-foreground"
                     >{{ twoDigits(value) }}</RadioGroupItem>
                   </RadioGroupRoot>
                 </ScrollArea>

@@ -217,7 +217,7 @@ function handleSearchKeydown(event: KeyboardEvent): void {
                       :aria-selected="
                         branch.id === branchStore.selectedBranchId
                       "
-                      class="flex w-full items-center gap-3 rounded-md px-3 py-3 text-left outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+                      class="enabled:cursor-pointer flex w-full items-center gap-3 rounded-md px-3 py-3 text-left outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
                       :class="{ 'bg-muted': index === activeIndex }"
                       :disabled="selecting"
                       @mouseenter="activeIndex = index"
@@ -253,7 +253,7 @@ function handleSearchKeydown(event: KeyboardEvent): void {
                 v-for="branch in quickBranches"
                 :key="branch.id"
                 type="button"
-                class="group flex min-h-20 items-center gap-3 rounded-xl border bg-background p-4 text-left transition-colors hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                class="enabled:cursor-pointer group flex min-h-20 items-center gap-3 rounded-xl border bg-background p-4 text-left transition-colors hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 :disabled="selecting"
                 @click="selectBranch(branch.id)"
               >

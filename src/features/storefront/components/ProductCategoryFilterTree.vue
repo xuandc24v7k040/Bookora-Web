@@ -48,7 +48,7 @@ function setExpanded(rootId: string, open: boolean): void {
       <div class="flex items-center gap-1">
         <button
           type="button"
-          class="min-w-0 flex-1 rounded px-2 py-2 text-left text-sm font-semibold hover:bg-[var(--bookora-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
+          class="enabled:cursor-pointer min-w-0 flex-1 rounded px-2 py-2 text-left text-sm font-semibold hover:bg-[var(--bookora-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
           :class="activeSlug === root.slug ? 'text-[var(--bookora-green)]' : ''"
           @click="emit('select', root.slug)"
         >
@@ -75,7 +75,7 @@ function setExpanded(rootId: string, open: boolean): void {
           v-for="child in root.children"
           :key="child.id"
           type="button"
-          class="block w-full rounded px-2 py-1.5 text-left text-sm hover:bg-[var(--bookora-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
+          class="enabled:cursor-pointer block w-full rounded px-2 py-1.5 text-left text-sm hover:bg-[var(--bookora-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
           :class="
             activeSlug === child.slug
               ? 'bg-[var(--bookora-soft)] font-semibold text-[var(--bookora-green)]'

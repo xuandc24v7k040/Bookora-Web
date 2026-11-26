@@ -5,28 +5,36 @@ import type {
 import type { useCartActions } from "./api/cart-api";
 import { serializeCheckoutCartItemIds } from "@/features/checkout/utils/checkout-selection";
 
+export class BuyNowSelectionError extends Error {}
+
 export async function prepareBuyNow(
   actions: ReturnType<typeof useCartActions>,
   variantId: string,
   quantity: number,
   branchId: string,
   flashOffer?: string,
+  isCurrent: () => boolean = () => true,
 ) {
   const cart = await actions.refresh();
-  if (cart.branch.id !== branchId)
-    throw new Error("Chi nhánh đã thay đổi. Vui lòng thử lại.");
+  if (cart.branch.id !== branchId || !isCurrent())
+    throw new BuyNowSelectionError(
+      "Chi nhánh hoặc lựa chọn đã thay đổi. Vui lòng thử lại.",
+    );
   const existing = cart.items.find((i) => i.productVariantId === variantId);
   const next: CartResponseDto = existing
-    ? await actions.update(existing.cartItemId, { quantity })
+    ? existing.quantity === quantity
+      ? cart
+      : await actions.update(existing.cartItemId, { quantity })
     : await actions.add({ productVariantId: variantId, quantity }, "BUY_NOW");
   const item = next.items.find((i) => i.productVariantId === variantId);
   if (
     next.branch.id !== branchId ||
+    !isCurrent() ||
     !item ||
     item.quantity !== quantity ||
     !item.isCheckoutEligible
   )
-    throw new Error(
+    throw new BuyNowSelectionError(
       "Sản phẩm hoặc số lượng đã thay đổi. Vui lòng kiểm tra giỏ hàng.",
     );
   return {

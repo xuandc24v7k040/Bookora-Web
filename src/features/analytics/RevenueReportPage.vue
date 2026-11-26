@@ -609,7 +609,7 @@ const completionRateLabel = computed(
                 </span>
                 <button
                   type="button"
-                  class="ml-auto font-medium text-blue-700 hover:underline"
+                  class="enabled:cursor-pointer ml-auto font-medium text-blue-700 hover:underline"
                   @click="selectedTrendKey = null"
                 >
                   Bỏ chọn
@@ -720,7 +720,7 @@ const completionRateLabel = computed(
               :key="item.branchId"
               type="button"
               :aria-pressed="selectedBranchId === item.branchId"
-              class="group relative block w-full rounded-lg p-2 text-left transition-[background-color,box-shadow] hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              class="enabled:cursor-pointer group relative block w-full rounded-lg p-2 text-left transition-[background-color,box-shadow] hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               :class="
                 selectedBranchId === item.branchId
                   ? 'bg-blue-50 ring-2 ring-blue-500'

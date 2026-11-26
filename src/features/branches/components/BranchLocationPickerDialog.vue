@@ -338,7 +338,7 @@ function confirm(): void {
               v-for="suggestion in suggestions"
               :key="suggestion.refId"
               type="button"
-              class="block w-full rounded px-3 py-2 text-left text-sm hover:bg-muted focus:bg-muted focus:outline-none"
+              class="enabled:cursor-pointer block w-full rounded px-3 py-2 text-left text-sm hover:bg-muted focus:bg-muted focus:outline-none"
               @click="selectSuggestion(suggestion)"
             >
               {{ suggestion.displayAddress }}

@@ -1356,7 +1356,7 @@ watch(
             </ul>
             <button
               type="button"
-              class="mt-4 flex w-full items-center gap-3 rounded-xl border border-[var(--bookora-green)]/20 bg-[var(--bookora-green)]/5 p-3 text-left transition-colors hover:bg-[var(--bookora-green)]/10 disabled:opacity-50"
+              class="enabled:cursor-pointer mt-4 flex w-full items-center gap-3 rounded-xl border border-[var(--bookora-green)]/20 bg-[var(--bookora-green)]/5 p-3 text-left transition-colors hover:bg-[var(--bookora-green)]/10 disabled:opacity-50"
               :disabled="isBusy"
               @click="couponDialogOpen = true"
             >

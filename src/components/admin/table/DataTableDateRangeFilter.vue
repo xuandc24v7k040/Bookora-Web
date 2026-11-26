@@ -549,7 +549,7 @@ function selectPreset(preset: { label: string; getValue: () => DateRangePresetVa
       v-if="hasDateRange && !disabled"
       type="button"
       aria-label="Xóa bộ lọc ngày"
-      class="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+      class="enabled:cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
       @click.stop="clearFilter"
     >
       <X class="h-3 w-3" />

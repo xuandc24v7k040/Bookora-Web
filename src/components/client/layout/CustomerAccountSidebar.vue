@@ -69,7 +69,7 @@ const items = [
       <div class="group relative mx-auto size-18">
         <button
           type="button"
-          class="block size-full rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)] focus-visible:ring-offset-2"
+          class="enabled:cursor-pointer block size-full rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)] focus-visible:ring-offset-2"
           aria-label="Quản lý ảnh đại diện"
           data-testid="customer-avatar-trigger"
           @click="avatarDialogOpen = true"
@@ -92,7 +92,7 @@ const items = [
           type="button"
           aria-label="Xem ảnh đại diện"
           data-testid="customer-avatar-preview"
-          class="absolute bottom-0 right-0 flex size-5 items-center justify-center rounded-full border border-white bg-black/65 text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
+          class="enabled:cursor-pointer absolute bottom-0 right-0 flex size-5 items-center justify-center rounded-full border border-white bg-black/65 text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
           @click.stop="previewOpen = true"
         >
           <Eye class="size-3" />
@@ -135,7 +135,7 @@ const items = [
       <button
         type="button"
         :disabled="isLoggingOut"
-        class="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm hover:bg-[var(--bookora-soft)] disabled:opacity-60"
+        class="enabled:cursor-pointer flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm hover:bg-[var(--bookora-soft)] disabled:opacity-60"
         @click="logoutCustomer"
       >
         <LogOut class="size-5" />{{

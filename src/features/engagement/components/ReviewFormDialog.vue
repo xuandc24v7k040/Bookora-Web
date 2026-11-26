@@ -197,7 +197,7 @@ function updateOpen(value: boolean): void {
                 v-for="value in 5"
                 :key="value"
                 type="button"
-                class="rounded-md p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
+                class="enabled:cursor-pointer rounded-md p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
                 :aria-label="`${value} sao — ${ratingLabels[value - 1]}`"
                 :aria-pressed="rating === value"
                 @click="rating = value"

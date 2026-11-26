@@ -279,7 +279,7 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnload))
             <p v-if="errors.primaryCategoryId" id="product-category-error" class="text-xs text-destructive">{{ errors.primaryCategoryId }}</p>
           </CardContent>
         </Card>
-        <Card><CardHeader><CardTitle>Tác giả</CardTitle></CardHeader><CardContent><ScrollArea class="h-72"><div class="grid gap-2 pr-4 sm:grid-cols-2"><label v-for="item in authors" :key="item.id" class="flex items-center gap-2 rounded-sm py-0.5 text-sm hover:bg-muted/40"><Checkbox class="focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2" :model-value="form.authorIds.includes(item.id)" @update:model-value="toggleId(form.authorIds, item.id, $event)" />{{ item.name }}</label><p v-if="authors.length === 0" class="text-sm text-muted-foreground">Chưa có tác giả.</p></div></ScrollArea></CardContent></Card>
+        <Card><CardHeader><CardTitle>Tác giả</CardTitle></CardHeader><CardContent><ScrollArea class="h-72"><div class="grid gap-2 pr-4 sm:grid-cols-2"><label v-for="item in authors" :key="item.id" class="has-[:enabled]:cursor-pointer flex items-center gap-2 rounded-sm py-0.5 text-sm hover:bg-muted/40"><Checkbox class="focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2" :model-value="form.authorIds.includes(item.id)" @update:model-value="toggleId(form.authorIds, item.id, $event)" />{{ item.name }}</label><p v-if="authors.length === 0" class="text-sm text-muted-foreground">Chưa có tác giả.</p></div></ScrollArea></CardContent></Card>
       </div>
 
       <Card>

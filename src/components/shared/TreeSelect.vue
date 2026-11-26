@@ -193,7 +193,7 @@ function select(value: string | null): void {
           <button
             v-if="!searchQuery"
             type="button"
-            class="flex w-full items-center rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent"
+            class="enabled:cursor-pointer flex w-full items-center rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent"
             @click="select(null)"
           >
             <Check
@@ -217,7 +217,7 @@ function select(value: string | null): void {
             v-for="item in visibleItems"
             :key="item.node.id"
             type="button"
-            class="flex w-full items-center rounded-sm py-1 pr-2 text-left text-sm hover:bg-accent"
+            class="enabled:cursor-pointer flex w-full items-center rounded-sm py-1 pr-2 text-left text-sm hover:bg-accent"
             :style="{ paddingLeft: `${item.depth * 16 + 8}px` }"
             @click="select(item.node.id)"
           >

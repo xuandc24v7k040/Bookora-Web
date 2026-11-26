@@ -553,7 +553,7 @@ function viewAllStock(): void {
                 </span>
                 <button
                   type="button"
-                  class="ml-auto font-medium text-blue-700 hover:underline"
+                  class="enabled:cursor-pointer ml-auto font-medium text-blue-700 hover:underline"
                   @click="selectedTrendKey = null"
                 >
                   Bỏ chọn
@@ -602,7 +602,7 @@ function viewAllStock(): void {
                 :key="item.key"
                 type="button"
                 :aria-pressed="selectedStatusKey === item.key"
-                class="flex w-full min-w-0 items-center gap-2 rounded-md px-2 py-1 text-left text-xs transition-colors hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:text-sm"
+                class="enabled:cursor-pointer flex w-full min-w-0 items-center gap-2 rounded-md px-2 py-1 text-left text-xs transition-colors hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:text-sm"
                 :class="selectedStatusKey === item.key ? 'bg-blue-50' : ''"
                 @click="selectStatus(item)"
               >
@@ -637,7 +637,7 @@ function viewAllStock(): void {
                 :key="item.key"
                 type="button"
                 :aria-pressed="selectedPerformanceKey === item.key"
-                class="group relative grid w-full min-w-0 gap-2 rounded-lg p-2 text-left transition-[background-color,box-shadow] hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:grid-cols-[minmax(8rem,0.8fr)_minmax(10rem,2fr)_auto] sm:items-center"
+                class="enabled:cursor-pointer group relative grid w-full min-w-0 gap-2 rounded-lg p-2 text-left transition-[background-color,box-shadow] hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:grid-cols-[minmax(8rem,0.8fr)_minmax(10rem,2fr)_auto] sm:items-center"
                 :class="
                   selectedPerformanceKey === item.key
                     ? 'bg-blue-50 ring-2 ring-blue-500'
@@ -675,7 +675,7 @@ function viewAllStock(): void {
                 :key="item.key"
                 type="button"
                 :aria-pressed="selectedPerformanceKey === item.key"
-                class="group relative flex min-w-0 flex-col items-center rounded-lg px-1 py-2 transition-[background-color,box-shadow] hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                class="enabled:cursor-pointer group relative flex min-w-0 flex-col items-center rounded-lg px-1 py-2 transition-[background-color,box-shadow] hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 :class="
                   selectedPerformanceKey === item.key
                     ? 'bg-blue-50 ring-2 ring-blue-500'
@@ -907,7 +907,7 @@ function viewAllStock(): void {
                 :key="item.method"
                 type="button"
                 :aria-pressed="selectedPaymentMethod === item.method"
-                class="grid w-full min-w-0 grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-2 rounded-md px-2 py-1 text-left text-sm transition-colors hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                class="enabled:cursor-pointer grid w-full min-w-0 grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-2 rounded-md px-2 py-1 text-left text-sm transition-colors hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 :class="
                   selectedPaymentMethod === item.method ? 'bg-blue-50' : ''
                 "

@@ -254,7 +254,7 @@ async function confirmDelete(): Promise<void> {
       >
         <article v-for="item in orderedMedia" :key="item.id" class="media-card min-w-0 overflow-hidden rounded-lg border bg-card" :data-media-id="item.id">
           <div class="relative">
-            <button type="button" class="media-action relative block aspect-square w-full overflow-hidden bg-muted" @pointerdown.stop @click="preview = item"><img :src="item.url" :alt="item.altText ?? 'Ảnh sản phẩm'" class="h-full w-full object-cover"><span class="absolute inset-0 grid place-items-center bg-black/0 text-white opacity-0 transition hover:bg-black/25 hover:opacity-100 focus-visible:bg-black/25 focus-visible:opacity-100"><Eye class="h-6 w-6" /></span></button>
+            <button type="button" class="enabled:cursor-pointer media-action relative block aspect-square w-full overflow-hidden bg-muted" @pointerdown.stop @click="preview = item"><img :src="item.url" :alt="item.altText ?? 'Ảnh sản phẩm'" class="h-full w-full object-cover"><span class="absolute inset-0 grid place-items-center bg-black/0 text-white opacity-0 transition hover:bg-black/25 hover:opacity-100 focus-visible:bg-black/25 focus-visible:opacity-100"><Eye class="h-6 w-6" /></span></button>
             <TooltipProvider :delay-duration="200">
               <Tooltip v-if="!readonly">
                 <TooltipTrigger as-child>

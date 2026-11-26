@@ -18,7 +18,7 @@ const props = defineProps<{
     :aria-selected="selected"
     :disabled="disabled"
     :class="cn(
-      'flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left text-sm outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+      '[:where(&:not(:disabled):not([aria-disabled=true]):not([data-disabled]):not([data-unavailable]))]:cursor-pointer flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left text-sm outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
       active && 'bg-muted',
       props.class,
     )"

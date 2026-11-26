@@ -381,7 +381,7 @@ defineExpose({ submit })
                 <Label>Vị trí tọa độ chi nhánh</Label>
                 <button
                   type="button"
-                  class="flex min-h-11 w-full items-center justify-between gap-3 rounded-md border px-3 py-2 text-left text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  class="enabled:cursor-pointer flex min-h-11 w-full items-center justify-between gap-3 rounded-md border px-3 py-2 text-left text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   :aria-invalid="Boolean(errors.latitude || errors.longitude)"
                   @click="pickerOpen = true"
                 >

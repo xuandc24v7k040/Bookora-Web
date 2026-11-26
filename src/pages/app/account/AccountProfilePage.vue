@@ -391,7 +391,7 @@ function displayBirthday(value: string | null | undefined): string {
                     "
                     class="pr-10" /><button
                     type="button"
-                    class="absolute right-2 top-1/2 -translate-y-1/2 p-1"
+                    class="enabled:cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 p-1"
                     @click="
                       visible[field.key as keyof typeof visible] =
                         !visible[field.key as keyof typeof visible]

@@ -134,7 +134,7 @@ watch(
     <ScrollBar v-if="hasHorizontalScrollbar" orientation="horizontal" />
     <ScrollAreaCorner />
 
-    <button
+    <button class="enabled:cursor-pointer"
       v-if="shouldShowScrollButtons"
       type="button"
       :disabled="!canScrollUp"
@@ -150,7 +150,7 @@ watch(
       <ChevronUp class="h-3.5 w-3.5" />
     </button>
 
-    <button
+    <button class="enabled:cursor-pointer"
       v-if="shouldShowScrollButtons"
       type="button"
       :disabled="!canScrollDown"

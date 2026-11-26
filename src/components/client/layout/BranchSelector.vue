@@ -217,7 +217,7 @@ function selectDraft(branch: StorefrontBranchResponseDto): void {
             type="button"
             role="radio"
             :aria-checked="draftBranchId === branch.id"
-            class="flex min-h-14 items-center justify-between rounded-lg border bg-background px-4 py-3 text-left text-sm transition-colors hover:border-[var(--bookora-green)] hover:bg-[var(--bookora-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
+            class="enabled:cursor-pointer flex min-h-14 items-center justify-between rounded-lg border bg-background px-4 py-3 text-left text-sm transition-colors hover:border-[var(--bookora-green)] hover:bg-[var(--bookora-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bookora-green)]"
             :class="
               draftBranchId === branch.id
                 ? 'border-[var(--bookora-green)] bg-[var(--bookora-soft)]'

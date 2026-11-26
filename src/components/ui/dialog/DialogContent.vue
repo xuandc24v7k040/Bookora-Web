@@ -33,7 +33,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
     >
       <slot />
       <DialogClose
-        class="ring-offset-background focus:ring-ring absolute right-3 top-3 grid size-9 place-items-center rounded-md opacity-70 transition-[background-color,opacity] hover:bg-muted hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none"
+        class="[:where(&:not(:disabled):not([aria-disabled=true]):not([data-disabled]):not([data-unavailable]))]:cursor-pointer ring-offset-background focus:ring-ring absolute right-3 top-3 grid size-9 place-items-center rounded-md opacity-70 transition-[background-color,opacity] hover:bg-muted hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none"
       >
         <Cross2Icon class="size-4" />
         <span class="sr-only">Đóng</span>

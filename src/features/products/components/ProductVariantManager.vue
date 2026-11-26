@@ -582,7 +582,7 @@ function askDeleteVariant(variant: ProductVariantResponseDto): void {
           "
         />
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <label class="flex items-center gap-2 text-sm"
+          <label class="has-[:enabled]:cursor-pointer flex items-center gap-2 text-sm"
             ><Checkbox v-model="singleDraft.isActive" />Đang bán</label
           ><Button :disabled="pending" @click="createSingle"
             ><Plus class="mr-2 h-4 w-4" />Tạo biến thể mặc định</Button
@@ -654,7 +654,7 @@ function askDeleteVariant(variant: ProductVariantResponseDto): void {
             v-model="bulkDefaults.salePrice"
             placeholder="Giá bán chung"
           />
-          <label class="flex items-center gap-2 text-sm"
+          <label class="has-[:enabled]:cursor-pointer flex items-center gap-2 text-sm"
             ><Checkbox v-model="bulkDefaults.isActive" />Đang bán</label
           >
           <Button type="button" variant="outline" @click="applyDefaults"
@@ -850,11 +850,11 @@ function askDeleteVariant(variant: ProductVariantResponseDto): void {
                 "
               />
               <div class="flex flex-wrap gap-4">
-                <label class="flex items-center gap-2 text-sm"
+                <label class="has-[:enabled]:cursor-pointer flex items-center gap-2 text-sm"
                   ><Checkbox
                     v-model="bulkDrafts[item.combinationKey]!.isActive"
                   />Đang bán</label
-                ><label class="flex items-center gap-2 text-sm"
+                ><label class="has-[:enabled]:cursor-pointer flex items-center gap-2 text-sm"
                   ><Checkbox
                     :model-value="bulkDrafts[item.combinationKey]!.isDefault"
                     @update:model-value="
@@ -937,7 +937,7 @@ function askDeleteVariant(variant: ProductVariantResponseDto): void {
               />
             </div>
             <div class="flex items-center justify-end gap-1">
-              <label class="mr-2 flex items-center gap-2 text-xs"
+              <label class="has-[:enabled]:cursor-pointer mr-2 flex items-center gap-2 text-xs"
                 ><Checkbox
                   v-model="editDrafts[variant.id]!.isActive"
                 />Bán</label

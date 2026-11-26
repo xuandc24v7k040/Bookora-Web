@@ -77,7 +77,7 @@ const mutableCount = computed(() => props.group.permissions.filter((permission) 
             </TooltipContent>
           </Tooltip>
 
-          <label :for="`role-permission-${permission.id}`" class="min-w-0 flex-1">
+          <label :for="`role-permission-${permission.id}`" class="[div:has([role=checkbox]:enabled)>&]:cursor-pointer min-w-0 flex-1">
             <span class="flex flex-wrap items-center gap-1.5 text-sm font-medium">
               {{ formatPermissionLabel(permission) }}
               <TriangleAlert
