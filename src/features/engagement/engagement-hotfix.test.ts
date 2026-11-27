@@ -52,7 +52,7 @@ describe("Phase 17 engagement hotfix", () => {
     expect(relatedProductsSource).toContain(
       "@media (hover: hover) and (pointer: fine)",
     );
-    expect(detailSource).not.toContain("<ScrollArea");
+    expect(relatedProductsSource).not.toContain("<ScrollArea");
   });
 
   it("uses the shared admin DataTable controls for review moderation", () => {
