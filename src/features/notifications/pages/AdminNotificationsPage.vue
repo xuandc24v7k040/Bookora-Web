@@ -9,6 +9,7 @@ import DataTable from '@/components/admin/table/DataTable.vue';
 import DataTableColumnHeader from '@/components/admin/table/DataTableColumnHeader.vue';
 import type { DataTableFilterableColumn, DataTableQuery } from '@/components/admin/table/interface';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useBranchStore } from '@/stores/branch.store';
 import { useNotificationQueries, notificationTarget } from '../notifications-api';
 import { notificationTime } from '../notification-presentation';
@@ -16,6 +17,12 @@ import { notificationTime } from '../notification-presentation';
 const branches = useBranchStore(), router = useRouter();
 const params = ref<NotificationsListParams>({ page: 1, limit: 10, sort: 'newest' });
 const state = useNotificationQueries(params);
+const notificationTypeLabels: Readonly<Record<string, string>> = {
+  ORDER_NEW_COD: 'Đơn hàng mới (COD)',
+  ORDER_NEW_PAID: 'Đơn hàng đã thanh toán',
+  ORDER_RECEIVED: 'Khách đã nhận hàng',
+  ORDER_CUSTOMER_CANCELLED: 'Khách hủy đơn hàng',
+};
 const filterableColumns: DataTableFilterableColumn[] = [{
   id: 'notificationView', title: 'Thông báo', multiple: false, operator: 'equals',
   options: [{ value: 'all', label: 'Tất cả' }, { value: 'unread', label: 'Chưa đọc' }, { value: 'order', label: 'Đơn hàng' }],
@@ -31,6 +38,9 @@ const columns: ColumnDef<NotificationItemDto>[] = [
     datetime: row.original.createdAt, title: new Date(row.original.createdAt).toLocaleString('vi-VN'),
     class: 'whitespace-nowrap text-muted-foreground',
   }, notificationTime(row.original.createdAt)) },
+  { accessorKey: 'type', header: 'Loại thông báo', meta: { title: 'Loại thông báo' }, enableSorting: false,
+    cell: ({ row }) => h(Badge, { variant: 'outline', class: 'whitespace-nowrap' },
+      () => notificationTypeLabels[row.original.type] ?? 'Thông báo khác') },
   { id: 'actions', header: '', meta: { title: 'Thao tác' }, enableSorting: false, cell: ({ row }) => h(Button, {
     variant: 'ghost', size: 'sm', class: 'cursor-pointer', onClick: () => select(row.original),
   }, () => 'Xem chi tiết →') },

@@ -115,12 +115,13 @@ describe("Phase 17 UI/UX hotfix contracts", () => {
   });
 
   it("uses underline review tabs and confirms delete with AlertDialog", () => {
-    const writtenReviewsSource = reviewsSource.slice(
-      reviewsSource.indexOf('<TabsContent value="written"'),
-    );
+    const writtenReviewsSource = reviewsSource.match(
+      /<TabsContent\b[^>]*\bvalue="written"[^>]*>([\s\S]*?)<\/TabsContent>/,
+    )?.[1] ?? "";
 
     expect(reviewsSource).toContain("<Tabs");
-    expect(reviewsSource).toContain("data-[state=active]:border");
+    expect(reviewsSource).toContain("<TabsIndicator");
+    expect(reviewsSource).toContain("client-tabs-indicator");
     expect(reviewsSource).toContain("<AlertDialog");
     expect(reviewsSource).toContain('@click="confirmDelete"');
     expect(alertDialogContentSource).toContain("pointer-events-auto");

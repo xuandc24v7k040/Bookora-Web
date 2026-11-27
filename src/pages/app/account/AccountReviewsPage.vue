@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from "vue";
+import { TabsIndicator } from "reka-ui";
+import "@/components/client/common/client-tabs.css";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRoute, useRouter } from "vue-router";
 import {
@@ -58,6 +60,10 @@ const activeTab = computed<ReviewTab>({
 const orderId = computed(
   () => firstQueryValue(route.query.orderId) || undefined,
 );
+const tabDirection = ref("client-tab-forward");
+watch(activeTab, (next) => {
+  tabDirection.value = next === "written" ? "client-tab-forward" : "client-tab-back";
+});
 const page = ref(1);
 const pendingPage = ref(1);
 const dialogOpen = ref(false);
@@ -218,283 +224,288 @@ function clearOrderFilter(): void {
         scrollbar-orientation="horizontal"
         class="w-full min-w-0 max-w-full border-b"
       >
-        <TabsList class="h-auto w-max rounded-none bg-transparent p-0">
+        <TabsList class="relative h-auto w-max rounded-none bg-transparent p-0">
+          <TabsIndicator aria-hidden="true" class="client-tabs-indicator absolute bottom-0 left-0 h-0.5 bg-[var(--bookora-green)] transition-[transform,width] duration-200 motion-reduce:transition-none" />
           <TabsTrigger
             value="pending"
-            class="flex-none rounded-none border-b-2 border-transparent bg-transparent px-5 py-3 shadow-none data-[state=active]:border-[var(--bookora-green)] data-[state=active]:bg-transparent data-[state=active]:text-[var(--bookora-green)] data-[state=active]:shadow-none"
+            class="flex-none rounded-none border-b-2 border-transparent bg-transparent px-5 py-3 shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[var(--bookora-green)] data-[state=active]:shadow-none"
           >
             Chờ đánh giá ({{ pending.data.value?.totalItems ?? 0 }})
           </TabsTrigger>
           <TabsTrigger
             value="written"
-            class="flex-none rounded-none border-b-2 border-transparent bg-transparent px-5 py-3 shadow-none data-[state=active]:border-[var(--bookora-green)] data-[state=active]:bg-transparent data-[state=active]:text-[var(--bookora-green)] data-[state=active]:shadow-none"
+            class="flex-none rounded-none border-b-2 border-transparent bg-transparent px-5 py-3 shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[var(--bookora-green)] data-[state=active]:shadow-none"
           >
             Đã đánh giá ({{ mine.data.value?.totalItems ?? 0 }})
           </TabsTrigger>
         </TabsList>
       </ScrollArea>
 
-      <TabsContent value="pending" class="mt-5">
-        <div
-          v-if="pending.isPending.value"
-          class="grid min-h-48 place-items-center"
-        >
-          <LoaderCircle class="size-7 animate-spin" />
-        </div>
-        <Card
-          v-else-if="!pending.data.value?.items.length"
-          class="grid min-h-48 place-items-center p-8 text-center text-muted-foreground"
-        >
-          {{
-            orderId
-              ? "Đơn hàng này không còn sản phẩm chờ đánh giá."
-              : "Bạn không có sản phẩm nào đang chờ đánh giá."
-          }}
-        </Card>
-        <Card v-else class="min-w-0 gap-0 overflow-hidden py-0 shadow-none">
-          <article
-            v-for="item in pending.data.value.items"
-            :key="item.orderItemId"
-            class="grid min-w-0 gap-4 border-b p-4 last:border-0 sm:grid-cols-[4.5rem_minmax(0,1fr)] lg:grid-cols-[4.5rem_minmax(0,1.2fr)_minmax(12rem,0.9fr)_12rem] lg:items-center"
-          >
-            <img
-              v-if="item.product.imageUrl"
-              :src="item.product.imageUrl"
-              :alt="item.product.name"
-              class="h-24 w-16 rounded border object-cover"
-            />
-            <span
-              v-else
-              class="grid h-24 w-16 place-items-center rounded border bg-muted"
-            >
-              <BookOpen class="size-6 text-muted-foreground" />
-            </span>
-            <div class="min-w-0">
-              <p
-                class="line-clamp-2 break-words font-semibold [overflow-wrap:anywhere]"
-              >
-                {{ item.product.name }}
-              </p>
-              <p
-                v-if="item.variantLabel"
-                class="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]"
-              >
-                <strong>Phân loại:</strong> {{ item.variantLabel }}
-              </p>
-            </div>
-            <div class="min-w-0 border-l-0 text-sm lg:border-l lg:pl-6">
-              <p class="font-medium">Đơn hàng</p>
-              <p
-                class="mt-1 break-words text-[var(--bookora-green)] [overflow-wrap:anywhere]"
-              >
-                {{ item.orderCode }}
-              </p>
-              <time
-                :datetime="item.completedAt"
-                class="mt-1 block text-muted-foreground"
-              >
-                Hoàn thành: {{ formatDateTime(item.completedAt) }}
-              </time>
-            </div>
-            <div class="text-left lg:text-center">
-              <Button type="button" @click="openCreate(item)">
-                <Star class="size-4" /> Đánh giá ngay
-              </Button>
-              <p class="mt-2 text-xs text-muted-foreground">
-                Chia sẻ trải nghiệm của bạn
-              </p>
-            </div>
-          </article>
-        </Card>
-        <nav
-          v-if="(pending.data.value?.totalPages ?? 0) > 1"
-          class="mt-5 flex items-center justify-center gap-2"
-          aria-label="Phân trang sản phẩm chờ đánh giá"
-        >
-          <Button
-            type="button"
-            size="icon"
-            variant="outline"
-            aria-label="Trang chờ đánh giá trước"
-            :disabled="pendingPage <= 1 || pending.isFetching.value"
-            @click="changePage('pending', pendingPage - 1)"
-          >
-            <ChevronLeft class="size-4" />
-          </Button>
-          <span class="px-3 text-sm">
-            {{ pendingPage }} / {{ pending.data.value?.totalPages }}
-          </span>
-          <Button
-            type="button"
-            size="icon"
-            variant="outline"
-            aria-label="Trang chờ đánh giá sau"
-            :disabled="
-              pendingPage >= (pending.data.value?.totalPages ?? 1) ||
-              pending.isFetching.value
-            "
-            @click="changePage('pending', pendingPage + 1)"
-          >
-            <ChevronRight class="size-4" />
-          </Button>
-        </nav>
-      </TabsContent>
-
-      <TabsContent value="written" class="mt-5">
-        <div
-          v-if="mine.isPending.value"
-          class="grid min-h-48 place-items-center"
-        >
-          <LoaderCircle class="size-7 animate-spin" />
-        </div>
-        <Card
-          v-else-if="!mine.data.value?.items.length"
-          class="grid min-h-48 place-items-center p-8 text-center text-muted-foreground"
-        >
-          {{
-            orderId
-              ? "Bạn chưa viết đánh giá nào cho đơn hàng này."
-              : "Bạn chưa viết đánh giá nào."
-          }}
-        </Card>
-        <Card v-else class="min-w-0 gap-0 overflow-hidden py-0 shadow-none">
-          <article
-            v-for="item in mine.data.value.items"
-            :key="item.id"
-            class="grid min-w-0 gap-4 border-b p-4 last:border-0 sm:grid-cols-[4.5rem_minmax(0,1fr)] xl:grid-cols-[4.5rem_minmax(12rem,0.9fr)_minmax(15rem,1.3fr)_auto] xl:items-center"
-          >
-            <img
-              v-if="item.product.imageUrl"
-              :src="item.product.imageUrl"
-              :alt="item.product.name"
-              class="h-24 w-16 rounded border object-cover"
-            />
-            <span
-              v-else
-              class="grid h-24 w-16 place-items-center rounded border bg-muted"
-            >
-              <BookOpen class="size-6 text-muted-foreground" />
-            </span>
-
-            <div class="min-w-0">
-              <p
-                class="line-clamp-2 break-words font-semibold [overflow-wrap:anywhere]"
-              >
-                {{ item.product.name }}
-              </p>
-              <p
-                class="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]"
-              >
-                Mã: {{ item.orderCode }}
-              </p>
-              <p
-                v-if="item.variantLabel"
-                class="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]"
-              >
-                <strong>Phân loại:</strong> {{ item.variantLabel }}
-              </p>
-            </div>
-
+      <div class="min-w-0 overflow-hidden">
+        <Transition :name="tabDirection" mode="out-in">
+          <TabsContent v-if="activeTab === 'pending'" key="pending" force-mount value="pending" class="mt-5">
             <div
-              class="min-w-0 sm:col-start-2 xl:col-start-auto xl:border-l xl:pl-5"
+              v-if="pending.isPending.value"
+              class="grid min-h-48 place-items-center"
             >
-              <div
-                class="flex text-amber-400"
-                :aria-label="`${item.rating} trên 5 sao`"
+              <LoaderCircle class="size-7 animate-spin" />
+            </div>
+            <Card
+              v-else-if="!pending.data.value?.items.length"
+              class="grid min-h-48 place-items-center p-8 text-center text-muted-foreground"
+            >
+              {{
+                orderId
+                  ? "Đơn hàng này không còn sản phẩm chờ đánh giá."
+                  : "Bạn không có sản phẩm nào đang chờ đánh giá."
+              }}
+            </Card>
+            <Card v-else class="min-w-0 gap-0 overflow-hidden py-0 shadow-none">
+              <article
+                v-for="item in pending.data.value.items"
+                :key="item.orderItemId"
+                class="grid min-w-0 gap-4 border-b p-4 last:border-0 sm:grid-cols-[4.5rem_minmax(0,1fr)] lg:grid-cols-[4.5rem_minmax(0,1.2fr)_minmax(12rem,0.9fr)_12rem] lg:items-center"
               >
-                <Star
-                  v-for="value in 5"
-                  :key="value"
-                  :class="[
-                    'size-4',
-                    value <= item.rating
-                      ? 'fill-current'
-                      : 'fill-muted text-muted',
-                  ]"
+                <img
+                  v-if="item.product.imageUrl"
+                  :src="item.product.imageUrl"
+                  :alt="item.product.name"
+                  class="h-24 w-16 rounded border object-cover"
                 />
-              </div>
-              <time
-                :datetime="item.createdAt"
-                class="mt-1 flex items-center gap-1 text-xs text-muted-foreground"
-              >
-                <Clock3 class="size-3.5" />
-                {{ formatDateTime(item.createdAt) }}
-              </time>
-              <p
-                :class="!expanded.has(item.id) && 'line-clamp-2'"
-                class="mt-2 whitespace-pre-wrap break-words text-sm [overflow-wrap:anywhere]"
-              >
-                {{ item.content?.trim() || "Không có nội dung đánh giá." }}
-              </p>
-              <ReviewMediaGallery :media="item.media" />
-              <Button
-                v-if="(item.content?.length ?? 0) > 140"
-                type="button"
-                variant="link"
-                class="h-auto px-0 py-1 text-xs"
-                @click="toggleExpanded(item.id)"
-              >
-                {{ expanded.has(item.id) ? "Thu gọn" : "Xem thêm" }}
-              </Button>
-            </div>
-
-            <div
-              class="flex items-center justify-end gap-2 sm:col-span-2 xl:col-span-1"
+                <span
+                  v-else
+                  class="grid h-24 w-16 place-items-center rounded border bg-muted"
+                >
+                  <BookOpen class="size-6 text-muted-foreground" />
+                </span>
+                <div class="min-w-0">
+                  <p
+                    class="line-clamp-2 break-words font-semibold [overflow-wrap:anywhere]"
+                  >
+                    {{ item.product.name }}
+                  </p>
+                  <p
+                    v-if="item.variantLabel"
+                    class="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]"
+                  >
+                    <strong>Phân loại:</strong> {{ item.variantLabel }}
+                  </p>
+                </div>
+                <div class="min-w-0 border-l-0 text-sm lg:border-l lg:pl-6">
+                  <p class="font-medium">Đơn hàng</p>
+                  <p
+                    class="mt-1 break-words text-[var(--bookora-green)] [overflow-wrap:anywhere]"
+                  >
+                    {{ item.orderCode }}
+                  </p>
+                  <time
+                    :datetime="item.completedAt"
+                    class="mt-1 block text-muted-foreground"
+                  >
+                    Hoàn thành: {{ formatDateTime(item.completedAt) }}
+                  </time>
+                </div>
+                <div class="text-left lg:text-center">
+                  <Button type="button" @click="openCreate(item)">
+                    <Star class="size-4" /> Đánh giá ngay
+                  </Button>
+                  <p class="mt-2 text-xs text-muted-foreground">
+                    Chia sẻ trải nghiệm của bạn
+                  </p>
+                </div>
+              </article>
+            </Card>
+            <nav
+              v-if="(pending.data.value?.totalPages ?? 0) > 1"
+              class="mt-5 flex items-center justify-center gap-2"
+              aria-label="Phân trang sản phẩm chờ đánh giá"
             >
               <Button
                 type="button"
-                size="sm"
+                size="icon"
                 variant="outline"
-                @click="openEdit(item)"
+                aria-label="Trang chờ đánh giá trước"
+                :disabled="pendingPage <= 1 || pending.isFetching.value"
+                @click="changePage('pending', pendingPage - 1)"
               >
-                <Pencil class="size-4" /> Sửa
+                <ChevronLeft class="size-4" />
               </Button>
+              <span class="px-3 text-sm">
+                {{ pendingPage }} / {{ pending.data.value?.totalPages }}
+              </span>
               <Button
                 type="button"
-                size="sm"
+                size="icon"
                 variant="outline"
-                class="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-                @click="requestDelete(item.id, $event)"
+                aria-label="Trang chờ đánh giá sau"
+                :disabled="
+                  pendingPage >= (pending.data.value?.totalPages ?? 1) ||
+                  pending.isFetching.value
+                "
+                @click="changePage('pending', pendingPage + 1)"
               >
-                <Trash2 class="size-4" /> Xóa
+                <ChevronRight class="size-4" />
               </Button>
-            </div>
-          </article>
-        </Card>
+            </nav>
+          </TabsContent>
 
-        <nav
-          v-if="(mine.data.value?.totalPages ?? 0) > 1"
-          class="mt-5 flex items-center justify-center gap-2"
-          aria-label="Phân trang đánh giá đã viết"
-        >
-          <Button
-            type="button"
-            size="icon"
-            variant="outline"
-            aria-label="Trang đánh giá đã viết trước"
-            :disabled="page <= 1 || mine.isFetching.value"
-            @click="changePage('written', page - 1)"
-          >
-            <ChevronLeft class="size-4" />
-          </Button>
-          <span class="px-3 text-sm">
-            {{ page }} / {{ mine.data.value?.totalPages }}
-          </span>
-          <Button
-            type="button"
-            size="icon"
-            variant="outline"
-            aria-label="Trang đánh giá đã viết sau"
-            :disabled="
-              page >= (mine.data.value?.totalPages ?? 1) ||
-              mine.isFetching.value
-            "
-            @click="changePage('written', page + 1)"
-          >
-            <ChevronRight class="size-4" />
-          </Button>
-        </nav>
-      </TabsContent>
+          <TabsContent v-else key="written" force-mount value="written" class="mt-5">
+            <div
+              v-if="mine.isPending.value"
+              class="grid min-h-48 place-items-center"
+            >
+              <LoaderCircle class="size-7 animate-spin" />
+            </div>
+            <Card
+              v-else-if="!mine.data.value?.items.length"
+              class="grid min-h-48 place-items-center p-8 text-center text-muted-foreground"
+            >
+              {{
+                orderId
+                  ? "Bạn chưa viết đánh giá nào cho đơn hàng này."
+                  : "Bạn chưa viết đánh giá nào."
+              }}
+            </Card>
+            <Card v-else class="min-w-0 gap-0 overflow-hidden py-0 shadow-none">
+              <article
+                v-for="item in mine.data.value.items"
+                :key="item.id"
+                class="grid min-w-0 gap-4 border-b p-4 last:border-0 sm:grid-cols-[4.5rem_minmax(0,1fr)] xl:grid-cols-[4.5rem_minmax(12rem,0.9fr)_minmax(15rem,1.3fr)_auto] xl:items-center"
+              >
+                <img
+                  v-if="item.product.imageUrl"
+                  :src="item.product.imageUrl"
+                  :alt="item.product.name"
+                  class="h-24 w-16 rounded border object-cover"
+                />
+                <span
+                  v-else
+                  class="grid h-24 w-16 place-items-center rounded border bg-muted"
+                >
+                  <BookOpen class="size-6 text-muted-foreground" />
+                </span>
+
+                <div class="min-w-0">
+                  <p
+                    class="line-clamp-2 break-words font-semibold [overflow-wrap:anywhere]"
+                  >
+                    {{ item.product.name }}
+                  </p>
+                  <p
+                    class="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]"
+                  >
+                    Mã: {{ item.orderCode }}
+                  </p>
+                  <p
+                    v-if="item.variantLabel"
+                    class="mt-1 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]"
+                  >
+                    <strong>Phân loại:</strong> {{ item.variantLabel }}
+                  </p>
+                </div>
+
+                <div
+                  class="min-w-0 sm:col-start-2 xl:col-start-auto xl:border-l xl:pl-5"
+                >
+                  <div
+                    class="flex text-amber-400"
+                    :aria-label="`${item.rating} trên 5 sao`"
+                  >
+                    <Star
+                      v-for="value in 5"
+                      :key="value"
+                      :class="[
+                        'size-4',
+                        value <= item.rating
+                          ? 'fill-current'
+                          : 'fill-muted text-muted',
+                      ]"
+                    />
+                  </div>
+                  <time
+                    :datetime="item.createdAt"
+                    class="mt-1 flex items-center gap-1 text-xs text-muted-foreground"
+                  >
+                    <Clock3 class="size-3.5" />
+                    {{ formatDateTime(item.createdAt) }}
+                  </time>
+                  <p
+                    :class="!expanded.has(item.id) && 'line-clamp-2'"
+                    class="mt-2 whitespace-pre-wrap break-words text-sm [overflow-wrap:anywhere]"
+                  >
+                    {{ item.content?.trim() || "Không có nội dung đánh giá." }}
+                  </p>
+                  <ReviewMediaGallery :media="item.media" />
+                  <Button
+                    v-if="(item.content?.length ?? 0) > 140"
+                    type="button"
+                    variant="link"
+                    class="h-auto px-0 py-1 text-xs"
+                    @click="toggleExpanded(item.id)"
+                  >
+                    {{ expanded.has(item.id) ? "Thu gọn" : "Xem thêm" }}
+                  </Button>
+                </div>
+
+                <div
+                  class="flex items-center justify-end gap-2 sm:col-span-2 xl:col-span-1"
+                >
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    @click="openEdit(item)"
+                  >
+                    <Pencil class="size-4" /> Sửa
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    class="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                    @click="requestDelete(item.id, $event)"
+                  >
+                    <Trash2 class="size-4" /> Xóa
+                  </Button>
+                </div>
+              </article>
+            </Card>
+
+            <nav
+              v-if="(mine.data.value?.totalPages ?? 0) > 1"
+              class="mt-5 flex items-center justify-center gap-2"
+              aria-label="Phân trang đánh giá đã viết"
+            >
+              <Button
+                type="button"
+                size="icon"
+                variant="outline"
+                aria-label="Trang đánh giá đã viết trước"
+                :disabled="page <= 1 || mine.isFetching.value"
+                @click="changePage('written', page - 1)"
+              >
+                <ChevronLeft class="size-4" />
+              </Button>
+              <span class="px-3 text-sm">
+                {{ page }} / {{ mine.data.value?.totalPages }}
+              </span>
+              <Button
+                type="button"
+                size="icon"
+                variant="outline"
+                aria-label="Trang đánh giá đã viết sau"
+                :disabled="
+                  page >= (mine.data.value?.totalPages ?? 1) ||
+                  mine.isFetching.value
+                "
+                @click="changePage('written', page + 1)"
+              >
+                <ChevronRight class="size-4" />
+              </Button>
+            </nav>
+          </TabsContent>
+        </Transition>
+      </div>
     </Tabs>
 
     <ReviewFormDialog

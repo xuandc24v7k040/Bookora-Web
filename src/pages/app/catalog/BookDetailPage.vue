@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { BookOpen, Minus, Plus, ShoppingCart, Star, Zap } from "@lucide/vue";
 import { computed, ref, watch } from "vue";
+import { TabsIndicator } from "reka-ui";
+import "@/components/client/common/client-tabs.css";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   useStorefrontAvailabilityQuery,
   useStorefrontProductDetailQuery,
@@ -127,6 +131,19 @@ function expireFlash() {
 }
 const cartPending = ref(false);
 const activeTab = ref<"description" | "details" | "reviews">("description");
+const detailTabs = [
+  { key: "description", label: "Mô tả sản phẩm" },
+  { key: "details", label: "Thông tin chi tiết" },
+  { key: "reviews", label: "Đánh giá" },
+] as const;
+const tabDirection = ref("client-tab-forward");
+watch(activeTab, (next, previous) => {
+  tabDirection.value =
+    detailTabs.findIndex((tab) => tab.key === next) >
+    detailTabs.findIndex((tab) => tab.key === previous)
+      ? "client-tab-forward"
+      : "client-tab-back";
+});
 const priceFormatter = new Intl.NumberFormat("vi-VN");
 const gallery = computed(() =>
   displayedVariant.value?.media.length
@@ -457,67 +474,52 @@ async function addToCart(buyNow = false): Promise<void> {
         <section
           class="min-w-0 rounded-xl border border-[var(--bookora-border)] bg-background p-5 sm:p-6"
         >
-          <div class="flex gap-6 border-b">
-            <button
-              type="button"
-              class="enabled:cursor-pointer border-b-2 px-2 pb-3 text-sm font-semibold"
-              :class="
-                activeTab === 'description'
-                  ? 'border-[var(--bookora-green)] text-[var(--bookora-green)]'
-                  : 'border-transparent'
-              "
-              @click="activeTab = 'description'"
-            >
-              Mô tả sản phẩm</button
-            ><button
-              type="button"
-              class="enabled:cursor-pointer border-b-2 px-2 pb-3 text-sm font-semibold"
-              :class="
-                activeTab === 'details'
-                  ? 'border-[var(--bookora-green)] text-[var(--bookora-green)]'
-                  : 'border-transparent'
-              "
-              @click="activeTab = 'details'"
-            >
-              Thông tin chi tiết</button
-            ><button
-              type="button"
-              class="enabled:cursor-pointer border-b-2 px-2 pb-3 text-sm font-semibold"
-              :class="
-                activeTab === 'reviews'
-                  ? 'border-[var(--bookora-green)] text-[var(--bookora-green)]'
-                  : 'border-transparent'
-              "
-              @click="activeTab = 'reviews'"
-            >
-              Đánh giá
-            </button>
-          </div>
-          <div
-            v-if="activeTab === 'description'"
-            class="prose prose-sm mt-5 max-w-none leading-7"
-            v-html="
-              product.description ||
-              product.shortDescription ||
-              'Thông tin mô tả đang được cập nhật.'
-            "
-          />
-          <PublicReviewSection
-            v-else-if="activeTab === 'reviews'"
-            :product-id="product.id"
-          />
-          <dl v-else class="mt-5 grid gap-3 text-sm sm:grid-cols-2">
-            <div
-              v-for="attribute in resolvedMetadata"
-              :key="attribute.key"
-              class="rounded-lg bg-[var(--bookora-cream)] p-3"
-            >
-              <dt class="text-[var(--bookora-muted)]">{{ attribute.label }}</dt>
-              <dd class="mt-1 font-semibold">
-                {{ attribute.value }}
-              </dd>
+          <Tabs v-model="activeTab">
+            <ScrollArea type="auto" scrollbar-orientation="horizontal" class="w-full min-w-0 border-b">
+              <TabsList class="relative flex h-auto w-max min-w-max max-w-none gap-6 rounded-none bg-transparent p-0 text-inherit" aria-label="Thông tin sản phẩm">
+                <TabsIndicator aria-hidden="true" class="client-tabs-indicator absolute bottom-0 left-0 h-0.5 bg-[var(--bookora-green)] transition-[transform,width] duration-200 motion-reduce:transition-none" />
+                <TabsTrigger
+                  v-for="tab in detailTabs"
+                  :key="tab.key"
+                  :value="tab.key"
+                  class="flex-none rounded-none border-b-2 border-transparent bg-transparent px-2 py-0 pb-3 text-sm font-semibold shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[var(--bookora-green)] data-[state=active]:shadow-none"
+                >
+                  {{ tab.label }}
+                </TabsTrigger>
+              </TabsList>
+            </ScrollArea>
+            <div class="min-w-0 overflow-hidden">
+              <Transition :name="tabDirection" mode="out-in">
+                <TabsContent :key="activeTab" :value="activeTab" force-mount class="mt-0 min-w-0">
+                  <div
+                    v-if="activeTab === 'description'"
+                    class="prose prose-sm mt-5 max-w-none leading-7"
+                    v-html="
+                      product.description ||
+                      product.shortDescription ||
+                      'Thông tin mô tả đang được cập nhật.'
+                    "
+                  />
+                  <PublicReviewSection
+                    v-else-if="activeTab === 'reviews'"
+                    :product-id="product.id"
+                  />
+                  <dl v-else class="mt-5 grid gap-3 text-sm sm:grid-cols-2">
+                    <div
+                      v-for="attribute in resolvedMetadata"
+                      :key="attribute.key"
+                      class="rounded-lg bg-[var(--bookora-cream)] p-3"
+                    >
+                      <dt class="text-[var(--bookora-muted)]">{{ attribute.label }}</dt>
+                      <dd class="mt-1 font-semibold">
+                        {{ attribute.value }}
+                      </dd>
+                    </div>
+                  </dl>
+                </TabsContent>
+              </Transition>
             </div>
-          </dl>
+          </Tabs>
         </section>
         <RelatedProductsSection
           :product-id="product.id"

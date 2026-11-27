@@ -167,7 +167,7 @@ describe("customer orders tabs and pagination contract", () => {
 
   it("uses the Bookora green token for active, hover and focus tab states", () => {
     expect(source).toContain(
-      "'border-[var(--bookora-green)] text-[var(--bookora-green)]'",
+      "data-[state=active]:text-[var(--bookora-green)]",
     );
     expect(source).toContain("hover:text-[var(--bookora-green)]");
     expect(source).toContain("focus-visible:ring-[var(--bookora-green)]");
@@ -176,10 +176,12 @@ describe("customer orders tabs and pagination contract", () => {
   });
 
   it("keeps the tab list usable on narrow screens", () => {
-    expect(source).toContain('role="tablist"');
+    const wrapper = mountPage();
+    expect(wrapper.find('[role="tablist"]').exists()).toBe(true);
     expect(source).toContain("<ScrollArea");
     expect(source).toContain('scrollbar-orientation="horizontal"');
     expect(source).not.toContain("overflow-x-auto");
+    wrapper.unmount();
   });
 
   it("sends limit 3, includes it in the cache key, and restores the active URL tab", async () => {
@@ -341,7 +343,10 @@ describe("customer orders tabs and pagination contract", () => {
       query: { tab: "all", page: "3" },
     });
 
-    await wrapper.findAll('[role="tab"]')[1]?.trigger("click");
+    await wrapper.findAll('[role="tab"]')[1]?.trigger("mousedown", {
+      button: 0,
+      ctrlKey: false,
+    });
     expect(pushMock).toHaveBeenCalledWith({
       query: { tab: "pending-payment", page: "1" },
     });

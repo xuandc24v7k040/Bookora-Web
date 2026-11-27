@@ -1,0 +1,34 @@
+.client-tabs-indicator {
+  width: var(--reka-tabs-indicator-size);
+  transform: translateX(var(--reka-tabs-indicator-position));
+}
+
+.client-tab-forward-enter-active,
+.client-tab-forward-leave-active,
+.client-tab-back-enter-active,
+.client-tab-back-leave-active {
+  transition:
+    transform 220ms ease,
+    opacity 220ms ease;
+}
+
+.client-tab-forward-enter-from,
+.client-tab-back-leave-to {
+  transform: translateX(24px);
+  opacity: 0;
+}
+
+.client-tab-back-enter-from,
+.client-tab-forward-leave-to {
+  transform: translateX(-24px);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .client-tab-forward-enter-active,
+  .client-tab-forward-leave-active,
+  .client-tab-back-enter-active,
+  .client-tab-back-leave-active {
+    transition: none;
+  }
+}

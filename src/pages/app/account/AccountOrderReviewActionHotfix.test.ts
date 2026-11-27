@@ -89,7 +89,11 @@ describe("Phase 17 order review action hotfix", () => {
     expect(ordersSource).toContain("reviewAction.type === 'VIEW'");
     expect(ordersSource).toContain("flex min-w-0 flex-wrap");
     expect(ordersSource).toContain("w-full shrink-0 sm:w-auto");
-    expect(ordersSource).not.toContain("absolute");
+    const orderCards = ordersSource.slice(
+      ordersSource.indexOf("<ul"),
+      ordersSource.indexOf("</ul>"),
+    );
+    expect(orderCards).not.toContain("absolute");
   });
 
   it("hydrates written tab and both server filters from the URL", async () => {
