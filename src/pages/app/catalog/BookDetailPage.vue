@@ -15,6 +15,7 @@ import {
 } from "@/features/storefront/api/storefront-api";
 import ProductAvailability from "@/features/storefront/components/ProductAvailability.vue";
 import ProductGallery from "@/features/storefront/components/ProductGallery.vue";
+import ProductDescription from "@/features/storefront/components/ProductDescription.vue";
 import ProductVariantSelector from "@/features/storefront/components/ProductVariantSelector.vue";
 import RelatedProductsSection from "@/features/storefront/components/RelatedProductsSection.vue";
 import RecentlyViewedSection from "@/features/storefront/components/RecentlyViewedSection.vue";
@@ -491,10 +492,10 @@ async function addToCart(buyNow = false): Promise<void> {
             <div class="min-w-0 overflow-hidden">
               <Transition :name="tabDirection" mode="out-in">
                 <TabsContent :key="activeTab" :value="activeTab" force-mount class="mt-0 min-w-0">
-                  <div
+                  <ProductDescription
                     v-if="activeTab === 'description'"
-                    class="prose prose-sm mt-5 max-w-none leading-7"
-                    v-html="
+                    :product-id="product.id"
+                    :html="
                       product.description ||
                       product.shortDescription ||
                       'Thông tin mô tả đang được cập nhật.'

@@ -64,9 +64,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import AnalyticsFilterBar, {
-  type AnalyticsPreset,
-} from "@/features/analytics/AnalyticsFilterBar.vue";
+import AnalyticsFilterBar from "@/features/analytics/AnalyticsFilterBar.vue";
+import { useAnalyticsDateFilter } from "./use-analytics-date-filter";
 import MetricCard from "@/features/analytics/MetricCard.vue";
 import {
   analyticsScopeKey,
@@ -98,13 +97,7 @@ const router = useRouter();
 const branchStore = useBranchStore();
 const { can } = useAdminPermissions();
 
-const preset = ref<AnalyticsPreset>(
-  ["7D", "30D", "90D", "CUSTOM"].includes(String(route.query.preset))
-    ? (String(route.query.preset) as AnalyticsPreset)
-    : "30D",
-);
-const from = ref(typeof route.query.from === "string" ? route.query.from : "");
-const to = ref(typeof route.query.to === "string" ? route.query.to : "");
+const { preset, from, to, selectPreset, selectCustom } = useAnalyticsDateFilter();
 const groupBy = ref<GroupBy>(
   ["DAY", "WEEK", "MONTH"].includes(String(route.query.groupBy))
     ? (String(route.query.groupBy) as GroupBy)
@@ -263,16 +256,6 @@ watch(
   },
   { flush: "post" },
 );
-
-function selectPreset(value: Exclude<AnalyticsPreset, "CUSTOM">): void {
-  preset.value = value;
-}
-
-function selectCustom(value: { from: string; to: string }): void {
-  preset.value = "CUSTOM";
-  from.value = value.from;
-  to.value = value.to;
-}
 
 async function exportCsv(): Promise<void> {
   exporting.value = true;

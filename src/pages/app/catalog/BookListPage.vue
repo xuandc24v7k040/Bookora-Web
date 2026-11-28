@@ -465,7 +465,7 @@ function filterItems(
         <nav
           v-if="data && data.totalPages > 1"
           aria-label="Phân trang sản phẩm"
-          class="mt-5 flex flex-wrap items-center justify-center gap-2"
+          class="client-pagination mt-5 flex flex-wrap items-center justify-center gap-2"
         >
           <Button
             type="button"
@@ -501,3 +501,13 @@ function filterItems(
     </div>
   </div>
 </template>
+
+<style scoped>
+.client-pagination {
+  --color-primary: var(--bookora-green);
+  --color-primary-foreground: white;
+  --color-ring: var(--bookora-green);
+  --color-accent: color-mix(in srgb, var(--bookora-green) 10%, white);
+  --color-accent-foreground: var(--bookora-green);
+}
+</style>

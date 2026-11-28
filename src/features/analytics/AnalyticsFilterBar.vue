@@ -3,8 +3,9 @@ import { computed } from "vue";
 import { Button } from "@/components/ui/button";
 import DataTableDateRangeFilter from "@/components/admin/table/DataTableDateRangeFilter.vue";
 import type { DateRangeValue } from "@/components/admin/table/interface";
+import type { AnalyticsPreset } from "./analytics-date-filter";
 
-export type AnalyticsPreset = "7D" | "30D" | "90D" | "CUSTOM";
+export type { AnalyticsPreset } from "./analytics-date-filter";
 
 const props = defineProps<{
   preset: AnalyticsPreset;
@@ -31,6 +32,10 @@ const rangeValue = computed<DateRangeValue>(() => ({
 
 function updateDateRange(value: DateRangeValue | string | undefined): void {
   const range = value && typeof value === "object" ? value : {};
+  if (!range.start && !range.end) {
+    emit("presetChange", "30D");
+    return;
+  }
   emit("customChange", {
     from: range.start ?? "",
     to: range.end ?? "",
