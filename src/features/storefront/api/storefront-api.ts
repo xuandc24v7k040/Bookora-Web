@@ -73,7 +73,12 @@ export function useStorefrontProductsQuery(
         { paramsSerializer: { indexes: null } },
         signal,
       ).then((response) => response.data),
-    placeholderData: (previous) => previous,
+    placeholderData: (previous, previousQuery) => {
+      const previousParams = previousQuery?.queryKey[2] as
+        | StorefrontProductsListParams
+        | undefined;
+      return previousParams?.q === unref(params).q ? previous : undefined;
+    },
   });
 }
 

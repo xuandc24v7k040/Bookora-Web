@@ -125,9 +125,9 @@ function clearHoveredIndex(index?: number): void {
               v-else-if="!visibleSuggestions.length"
               class="rounded-lg border border-dashed p-6 text-center"
             >
-              <p class="font-semibold">Không tìm thấy sản phẩm phù hợp.</p>
+              <p class="font-semibold">Chưa có gợi ý nhanh phù hợp.</p>
               <p class="mt-1 text-sm text-[var(--bookora-muted)]">
-                Thử từ khóa ngắn hơn hoặc kiểm tra lại chính tả.
+                Nhấn Enter hoặc nút tìm kiếm để xem kết quả đầy đủ.
               </p>
             </div>
 
